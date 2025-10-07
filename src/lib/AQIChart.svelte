@@ -27,14 +27,14 @@
 		{"name":"Unhealthy for Sensitive Groups","min":101,"max":150,"color":"#f99049"},
 		{"name":"Unhealthy","min":151,"max":200,"color":"#f65e5f"},
 		{"name":"Very Unhealthy","min":201,"max":300,"color":"#a070b6"},
-		{"name":"Hazardous","min":301,"color":"#a06a7b"},
-		{"name":"None Data","min":null,"color":"#bbbbbb"}
+		{"name":"Hazardous","min":301,"color":"#a06a7b"}
+		// {"name":"None Data","min":0,"color":"#bbbbbb"}
 	]
-	console.log(data);
+
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
 
-	let minAQI = data.reduce((z, a) => z < a.usAqi ? z : a.usAqi , data[0].usAqi);
+	// let minAQI = data.reduce((z, a) => z < a.usAqi ? z : a.usAqi , data[0].usAqi);
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
 	function getColour(val : number) {
@@ -55,25 +55,17 @@
 		}
 	}
 
-	let symbolGenerator = d3.symbol().type(d3.symbolCircle).size(20);
-	let pointData = data.map(d => {
-		const dp : dataPoint = {
-			tp : d.timestamp,
-			usAqi : d.usAqi
-		} 
-		return dp;
-	})
-	let points = pointData.map(d => symbolGenerator(d));
-	// let pointGenerator = d3.
-	// let symbolData = 
-
-	let svgEl: SVGSVGElement;
+	let svgElem: SVGSVGElement;
 	function makeGraph() {
 		const margin = {top: 10, right: 30, bottom: 30, left: 60},
-			width = 600 - margin.left - margin.right,
+			width = 900 - margin.left - margin.right,
 			height = 400 - margin.top - margin.bottom;
 
-		const svg = d3.select(svgEl)
+		const svgG = d3.select(svgElem)
+			.selectAll("*")
+			.remove();
+			
+		const svg = d3.select(svgElem)
 			.append("svg")
 			.attr("width", width + margin.left + margin.right)
 			.attr("height", height + margin.top + margin.bottom)
@@ -92,51 +84,64 @@
 			.domain([0, maxAQI])
 			.range([ height, 0]);
 		svg.append("g")
-			.call(d3.axisLeft(y));
+			.call(d3.axisLeft(y).tickValues(d3.range(0, maxAQI, 20)));
+			
 
+		const band = d3.scaleLinear()
+			// .domain(colours.map(d => d.min.toString()))
+			.domain([0, maxAQI])
+			.range([height, 0]);
+			// .range([height, maxAQI])
 		svg.append('g')
-			.selectAll("dot")
-			.data(data)
-			.join("circle")
-			.attr("cx", function (d) { return x(d.timestamp); } )
-			.attr("cy", function (d) { return y(d.usAqi); } )
-			.attr("r", 1.5)
-			.style("fill",  "#000")
-			// .style("fill",  d => getColour(d.usAqi))
+			.selectAll("rect.aqiColors")
+			.data(colours)
+			.join("rect")
+			.attr("class", "aqiColors")
+			.attr("x", 0)
+			// .attr("y", 0)
+			.attr("y", d => band(d.max || maxAQI))
+			.attr("width", width)
+			// .attr("height", d => Math.abs((d.max || d.min+50) - d.min) -1)
+			.attr("height", d => band(d.min) -band(d.max ?? maxAQI))
+			.style("fill",  d => getColour(d.min))
+			.attr("opacity", 0.5);
 
+
+		// show raw data if toggle 
+		if (showRawData) {
+			svg.append('g')
+				.selectAll("dot")
+				.data(data)
+				.join("circle")
+				.attr("cx", function (d) { return x(d.timestamp); } )
+				.attr("cy", function (d) { return y(d.usAqi); } )
+				.attr("r", 1.5)
+				.style("fill",  "#000")
+		}
 	}
 
-	onMount(makeGraph);
+	$effect(() => {
+		if (svgElem) {
+			const svg = d3.select(svgElem);
+			svg.selectAll('circle').remove();
+			svg.selectAll("rect").remove();
+			makeGraph();
+		}else {
+			return;
+		}
+	});
 
+
+	onMount(makeGraph);
 	// just for debugging; can be removed
 	$inspect(data);
 
-
 </script>
 
-<!--<pre>-->
-<!--{JSON.stringify(data[0], null, 2)}-->
-<!--</pre>-->
-{#if showRawData}
-<!--	<p>Data url {url}</p>-->
-{/if}
-
-<svg bind:this={svgEl} width="600" height="320"  style:display={showRawData ? 'block' : 'none'}>
-</svg>
-<!--<svg viewBox="-50 -50 100 100">-->
-	<!-- {#each points as p, i}  -->
-<!--<svg id="my_dataviz">-->
-<!--{#if showRawData}-->
-
-<!--{/if} -->
-	<!--{#each data as dp}]-->
-	<!--		{#if showRawData}-->
-	<!--		<path d={dp.timestamp.getFullYear().toString()} fill={getColour(dp.usAqi)}/>-->
-	<!--	&lt;!&ndash; <path d={dp} fill={getColour(dp.usAqi)}/> &ndash;&gt;-->
-	<!--		{/if}-->
-	<!--{/each}-->
-
-<p>svg</p>
+<div>
+	<svg bind:this={svgElem} width="600" height="320"  >
+	</svg>
+</div>
 
 <style>
 	svg {

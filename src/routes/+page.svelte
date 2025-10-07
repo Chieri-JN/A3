@@ -74,28 +74,6 @@
 	}
 	);
 
-	// const data = $derived.by(() =>
-	// 	d3.csv(datasets[selectedDataset], (dt: any[]) => ({
-	// 			if (dt.Lenght() == 1) {
-	// 				let d = dt[0];
-	// 				return {
-	// 					city: d.City,
-	// 					country: d.Country,
-	// 					mainPollutant: d['Main pollutant'],
-	// 					pm25: +d['PM2.5'],
-	// 					state: d.State,
-	// 					stationName: d['Station name'],
-	// 					timestamp: new Date(d['Timestamp(UTC)']),
-	// 					usAqi: +d['US AQI']
-	// 				}
-	// 			} else {
-	//
-	// 			}
-	// 		}
-	// 	))
-	// );
-
-
 	const stations = [
 		{ 
 			name : 'Avalon' , 
@@ -151,7 +129,7 @@
 				{#each stations as s}
 					<option value ={s.id}>
 						{s.name}
-						{ data.length} 
+						({ data.length})
 					</option>
 				{/each}
 			</select>
@@ -167,7 +145,6 @@
 	</div>
 
 	<div>
-		Visualization here
 		<AQIChart {data} url={datasets[selectedDataset]} showRawData={showRawData} />
 	</div>
 	
