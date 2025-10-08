@@ -1,7 +1,11 @@
 <script lang="ts">
-	// import { timeStamp } from 'console';
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
+
+	interface shortItem {
+		timestamp : Date;
+		usAqi : number;
+	}
 
 	interface Item {
 		city: string;
@@ -14,11 +18,6 @@
 		usAqi: number;
 	}
 
-	interface dataPoint {
-		tp : Date;
-		usAqi: number
-	}
-
 	// properties this component accepts
 	let { data , url, showRawData=false}: { data: Item[] , url : string, showRawData: Boolean} = $props();
 	let colours = [
@@ -28,12 +27,11 @@
 		{"name":"Unhealthy","min":151,"max":200,"color":"#f65e5f"},
 		{"name":"Very Unhealthy","min":201,"max":300,"color":"#a070b6"},
 		{"name":"Hazardous","min":301,"color":"#a06a7b"}
-		// {"name":"None Data","min":0,"color":"#bbbbbb"}
-	]
+	];
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
-
+	// console.log(data[0].timestamp)
 	// let minAQI = data.reduce((z, a) => z < a.usAqi ? z : a.usAqi , data[0].usAqi);
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
@@ -55,6 +53,30 @@
 		}
 	}
 
+	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
+	const avgDataMap = new Map();
+	remappedDates.forEach(d => {
+		const key = d.timestamp.toString()
+		const newL = avgDataMap.get(key) ??  [0, 0];
+		avgDataMap.set(key, [d.usAqi + newL[0], newL[1] + 1]);
+	})
+
+	avgDataMap.forEach((v,k) => {
+		avgDataMap.set(k, v[0]/v[1])
+	})
+
+	remappedDates.forEach(d => {
+		d.usAqi =  avgDataMap.get(d.timestamp.toString())
+		return d;
+	})
+	remappedDates.sort((a,b) =>  a.timestamp.getTime() - b.timestamp.getTime())
+	data.sort((a,b) =>  a.timestamp.getTime() - b.timestamp.getTime())
+	let dataValues = remappedDates.map(d => d.usAqi);
+	const p10 = d3.quantile(dataValues, 0.10) ?? maxAQI*0.1;
+	const p90 = d3.quantile(dataValues, 0.90) ?? maxAQI*.9;
+	let filteredData = data.filter(d => d.usAqi >= p10 && d.usAqi <= p90);
+
+
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
 		const margin = {top: 10, right: 30, bottom: 30, left: 60},
@@ -72,7 +94,6 @@
 			.append("g")
 			.attr("transform", `translate(${margin.left}, ${margin.top})`);
 
-		// X axis
 		const x = d3.scaleTime()
 			.domain([minYear,maxYear])
 			.range([0, width]);
@@ -88,25 +109,37 @@
 			
 
 		const band = d3.scaleLinear()
-			// .domain(colours.map(d => d.min.toString()))
 			.domain([0, maxAQI])
 			.range([height, 0]);
-			// .range([height, maxAQI])
 		svg.append('g')
 			.selectAll("rect.aqiColors")
 			.data(colours)
 			.join("rect")
 			.attr("class", "aqiColors")
 			.attr("x", 0)
-			// .attr("y", 0)
 			.attr("y", d => band(d.max || maxAQI))
 			.attr("width", width)
-			// .attr("height", d => Math.abs((d.max || d.min+50) - d.min) -1)
-			.attr("height", d => band(d.min) -band(d.max ?? maxAQI))
+			.attr("height", d => band(d.min) -band(d.max || maxAQI))
 			.style("fill",  d => getColour(d.min))
 			.attr("opacity", 0.5);
 
+		const line = d3.line<Item>()
+			.x(d => x(d.timestamp))
+			.y(d => y(d.usAqi))
 
+		svg.append("path")
+			.datum(remappedDates)
+			.attr("fill", "none")
+			.attr("stroke", "steelblue")
+			.attr("stroke-width", 1.5)
+			.attr("d", line)
+
+		const eightyP = d3.area()
+			.x()
+
+
+
+		
 		// show raw data if toggle 
 		if (showRawData) {
 			svg.append('g')

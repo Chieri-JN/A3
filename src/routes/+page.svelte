@@ -43,18 +43,17 @@
 			const combinedData = datasets["all"].map(dataSet => {
 					return d3.csv(dataSet, (d: any) =>
 						({
-								city: d.City,
-								country: d.Country,
-								mainPollutant: d['Main pollutant'],
-								pm25: +d['PM2.5'],
-								state: d.State,
-								stationName: d['Station name'],
-								timestamp: new Date(d['Timestamp(UTC)']),
-								usAqi: +d['US AQI']
+							city: d.City,
+							country: d.Country,
+							mainPollutant: d['Main pollutant'],
+							pm25: +d['PM2.5'],
+							state: d.State,
+							stationName: d['Station name'],
+							timestamp: new Date(d['Timestamp(UTC)']),
+							usAqi: +d['US AQI']
 							}
 						))
-
-			});
+					});
 			const loadedData = await Promise.all(combinedData);
 			return loadedData.flat();
 
