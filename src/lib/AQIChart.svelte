@@ -2,11 +2,6 @@
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
 
-	interface shortItem {
-		timestamp : Date;
-		usAqi : number;
-	}
-
 	interface Item {
 		city: string;
 		country: string;
@@ -16,6 +11,8 @@
 		stationName: string;
 		timestamp: Date;
 		usAqi: number;
+		low : number;
+		high : number;
 	}
 
 	// properties this component accepts
@@ -31,8 +28,6 @@
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
-	// console.log(data[0].timestamp)
-	// let minAQI = data.reduce((z, a) => z < a.usAqi ? z : a.usAqi , data[0].usAqi);
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
 	function getColour(val : number) {
@@ -55,27 +50,26 @@
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
 	const avgDataMap = new Map();
+	const allPointsInMonth = new Map();
 	remappedDates.forEach(d => {
 		const key = d.timestamp.toString()
 		const newL = avgDataMap.get(key) ??  [0, 0];
+		const curr : number[] = allPointsInMonth.get(key) ?? [];
 		avgDataMap.set(key, [d.usAqi + newL[0], newL[1] + 1]);
+		curr.push(d.usAqi);
+		allPointsInMonth.set(key, curr)
 	})
-
+	// get rid of this and just use values list
 	avgDataMap.forEach((v,k) => {
 		avgDataMap.set(k, v[0]/v[1])
 	})
-
 	remappedDates.forEach(d => {
 		d.usAqi =  avgDataMap.get(d.timestamp.toString())
-		return d;
+		const monthVals = allPointsInMonth.get(d.timestamp.toString())
+		d.low = d3.quantile(monthVals, 0.10) ?? maxAQI*0.1;
+		d.high = d3.quantile(monthVals, 0.90) ?? maxAQI*.9;
 	})
 	remappedDates.sort((a,b) =>  a.timestamp.getTime() - b.timestamp.getTime())
-	data.sort((a,b) =>  a.timestamp.getTime() - b.timestamp.getTime())
-	let dataValues = remappedDates.map(d => d.usAqi);
-	const p10 = d3.quantile(dataValues, 0.10) ?? maxAQI*0.1;
-	const p90 = d3.quantile(dataValues, 0.90) ?? maxAQI*.9;
-	let filteredData = data.filter(d => d.usAqi >= p10 && d.usAqi <= p90);
-
 
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
@@ -117,29 +111,35 @@
 			.join("rect")
 			.attr("class", "aqiColors")
 			.attr("x", 0)
-			.attr("y", d => band(d.max || maxAQI))
+			.attr("y", d => band(d.max ?? maxAQI))
 			.attr("width", width)
-			.attr("height", d => band(d.min) -band(d.max || maxAQI))
+			.attr("height", d => band(d.min) -band(d.max ?? maxAQI))
 			.style("fill",  d => getColour(d.min))
 			.attr("opacity", 0.5);
+
+		const eightyP = d3.area<Item>()
+			.x(d => x(d.timestamp))
+			.y0(d => y(d.low))
+			.y1(d => y(d.high))
+
+		svg.append("path")
+			.datum(remappedDates)
+			.attr("fill", "#111111")
+			.attr("stroke", "none")
+			.attr("stroke-width", 0)
+			.attr("d", eightyP)
+			.attr("opacity", 0.2);
 
 		const line = d3.line<Item>()
 			.x(d => x(d.timestamp))
 			.y(d => y(d.usAqi))
-
 		svg.append("path")
 			.datum(remappedDates)
 			.attr("fill", "none")
-			.attr("stroke", "steelblue")
-			.attr("stroke-width", 1.5)
+			.attr("stroke", "black")
+			.attr("stroke-width", 2)
 			.attr("d", line)
 
-		const eightyP = d3.area()
-			.x()
-
-
-
-		
 		// show raw data if toggle 
 		if (showRawData) {
 			svg.append('g')
