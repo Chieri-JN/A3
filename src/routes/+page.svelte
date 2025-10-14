@@ -1,41 +1,14 @@
 <script lang="ts">
 	import AQIChart from '$lib/AQIChart.svelte';
 	import * as d3 from 'd3';
+	import { colours, datasets, stations } from '$lib/constants';
+	import Chip from '$lib/Chip.svelte';
 
-	const datasets = {
-		avalon:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BAvalon%5D_daily-avg.csv'],
-		glassport_high_street:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BGlassport%20High%20Street%5D_daily-avg.csv'],
-		lawrenceville:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BLawrenceville%5D_daily-avg.csv'],
-		liberty_sahs:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BLiberty%20(SAHS)%5D_daily-avg.csv'],
-		manchester:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BManchester%5D_daily-avg.csv'],
-		north_braddock:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BNorth%20Braddock%5D_daily-avg.csv'],
-		parkway_east_near_road:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BParkway%20East%20(Near%20Road)%5D_daily-avg.csv'],
-		usa_pennsylvania_pittsburgh:
-			['https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BUSA-Pennsylvania-Pittsburgh%5D_daily-avg.csv'],
 
-		// Combine all the csv
-		all : [
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BAvalon%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BGlassport%20High%20Street%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BLawrenceville%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BLiberty%20(SAHS)%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BManchester%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BNorth%20Braddock%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BParkway%20East%20(Near%20Road)%5D_daily-avg.csv',
-			'https://dig.cmu.edu/datavis-fall-2025/assignments/data/%5BUSA-Pennsylvania-Pittsburgh%5D_daily-avg.csv',
-		]
-	};
 
 	let showRawData = $state(false);
 
-	let selectedDataset: keyof typeof datasets = $state('avalon');
+	let selectedDataset: keyof typeof datasets = $state('lawrenceville');
 
 	const data = $derived.by(async () =>
 	{
@@ -73,46 +46,8 @@
 	}
 	);
 
-	const stations = [
-		{ 
-			name : 'Avalon' , 
-			id : "avalon"
-		},
-		{
-			name :"Glassport High Street",
-			id : "glassport_high_street"
-		},
-		{ 
-			name :"North Braddock", 
-			id : 'north_braddock'
-		},
-		{ 
-			name :"Lawrenceville", 
-			id :  "lawrenceville"
-		},
-		{ 
-			name :"Parkway East", 
-			id : "parkway_east_near_road" 
-		},
-		{ 
-			name :"Manchester", 
-			id : "manchester" 
-		},
-		{ 
-			name :"Liberty (SAHS)" , 
-			id : "liberty_sahs"
-		},
-		{ 
-			name : "USA Pennsylvania Pittsburgh",
-			id : "usa_pennsylvania_pittsburgh"
-		},
-		{
-			name : "all",
-			id : "all"
-		}
-
-	];
 	stations.sort((a, b) => a.name.localeCompare(b.name));
+
 </script>
 
 {#await data}
@@ -120,7 +55,7 @@
 	<p>loading data...</p>
 {:then data}
 	<!-- promise was fulfilled or not a Promise -->
-	<h2>AQI Chart for {data[0].stationName || data[0].city}</h2>
+	<h2>AQI Chart for { selectedDataset==="all" ? "All Stations" : data[0].stationName ?? data[0].city}</h2>
 	<div>
 		<label class="region-selector">
 			<select class="region-selector" bind:value={selectedDataset}>
@@ -143,8 +78,18 @@
 		<p>Number of Records { data.length} </p>
 	</div>
 
-	<div>
-		<AQIChart {data} url={datasets[selectedDataset]} showRawData={showRawData} />
+	<div  style="padding-bottom: 100px">
+		<AQIChart {data} url={datasets[selectedDataset]} showRawData={showRawData}/>
+	</div>
+
+	<div class="legend">
+		US AQI:
+		{#each colours as c}
+				<span style="padding: 5px">
+					<Chip name={c.name} colour={c.color} rMax={c.max} rMin={c.min}/>
+				</span>
+
+			{/each}
 	</div>
 	
 {:catch error}
@@ -161,4 +106,10 @@
 	.region-selector{
 		align-self: center;
 	}
+
+	.legend{
+			align-items: center;
+			display: inline-flex;
+	}
+
 </style>

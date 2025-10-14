@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
+	import {colours} from '$lib/constants';
 
 	interface Item {
 		city: string;
@@ -17,14 +18,6 @@
 
 	// properties this component accepts
 	let { data , url, showRawData=false}: { data: Item[] , url : string, showRawData: Boolean} = $props();
-	let colours = [
-		{"name":"Good","min":0,"max":50,"color":"#9cd84e"},
-		{"name":"Moderate","min":51,"max":100,"color":"#facf39"},
-		{"name":"Unhealthy for Sensitive Groups","min":101,"max":150,"color":"#f99049"},
-		{"name":"Unhealthy","min":151,"max":200,"color":"#f65e5f"},
-		{"name":"Very Unhealthy","min":201,"max":300,"color":"#a070b6"},
-		{"name":"Hazardous","min":301,"color":"#a06a7b"}
-	];
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
@@ -49,22 +42,16 @@
 	}
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
-	const avgDataMap = new Map();
 	const allPointsInMonth = new Map();
 	remappedDates.forEach(d => {
 		const key = d.timestamp.toString()
-		const newL = avgDataMap.get(key) ??  [0, 0];
 		const curr : number[] = allPointsInMonth.get(key) ?? [];
-		avgDataMap.set(key, [d.usAqi + newL[0], newL[1] + 1]);
 		curr.push(d.usAqi);
 		allPointsInMonth.set(key, curr)
 	})
-	// get rid of this and just use values list
-	avgDataMap.forEach((v,k) => {
-		avgDataMap.set(k, v[0]/v[1])
-	})
 	remappedDates.forEach(d => {
-		d.usAqi =  avgDataMap.get(d.timestamp.toString())
+		const lst : number[] = allPointsInMonth.get(d.timestamp.toString())
+		d.usAqi = lst.reduce((z,a) => z+a, 0) / lst.length
 		const monthVals = allPointsInMonth.get(d.timestamp.toString())
 		d.low = d3.quantile(monthVals, 0.10) ?? maxAQI*0.1;
 		d.high = d3.quantile(monthVals, 0.90) ?? maxAQI*.9;
@@ -73,11 +60,11 @@
 
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
-		const margin = {top: 10, right: 30, bottom: 30, left: 60},
+		const margin = {top: 5, right: 30, bottom: 30, left: 60},
 			width = 900 - margin.left - margin.right,
 			height = 400 - margin.top - margin.bottom;
 
-		const svgG = d3.select(svgElem)
+		d3.select(svgElem)
 			.selectAll("*")
 			.remove();
 			
@@ -95,12 +82,28 @@
 			.attr("transform", `translate(0, ${height})`)
 			.call(d3.axisBottom(x).ticks(5));
 
+		const yAxis = d3.scaleLinear()
+			.domain([0, maxAQI])
+			.range([ height, 0]);
+		svg.append("g")
+			.call(d3.axisLeft(yAxis)
+				.tickValues(d3.ticks(0, maxAQI, 10))
+				.tickFormat(d => "")
+				.tickSize(-width))
+			.attr("stroke", "#ccc")
+			.attr("opacity", 0.2);
+
+		// unsure how to remove double tick when the maxAQI is close to a tick line...
+		/*
+			TODO fix double tick when  maxAQI is close to a tick line...
+		 */
 		const y = d3.scaleLinear()
 			.domain([0, maxAQI])
 			.range([ height, 0]);
 		svg.append("g")
-			.call(d3.axisLeft(y).tickValues(d3.range(0, maxAQI, 20)));
-			
+			.call(d3.axisLeft(y)
+				.tickValues(d3.ticks(0, maxAQI, 10))
+				.tickFormat(d => d.toString()))
 
 		const band = d3.scaleLinear()
 			.domain([0, maxAQI])
@@ -113,7 +116,7 @@
 			.attr("x", 0)
 			.attr("y", d => band(d.max ?? maxAQI))
 			.attr("width", width)
-			.attr("height", d => band(d.min) -band(d.max ?? maxAQI))
+			.attr("height", d => band(d.min-1 < 0 ? 0 : d.min-1 ) -band(d.max ?? maxAQI))
 			.style("fill",  d => getColour(d.min))
 			.attr("opacity", 0.5);
 
