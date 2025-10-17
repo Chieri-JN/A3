@@ -4,8 +4,6 @@
 	import { colours, datasets, stations } from '$lib/constants';
 	import Chip from '$lib/Chip.svelte';
 
-
-
 	let showRawData = $state(false);
 
 	let selectedDataset: keyof typeof datasets = $state('lawrenceville');
@@ -13,7 +11,7 @@
 	const data = $derived.by(async () =>
 	{
 		if (selectedDataset === "all") {
-			const combinedData = datasets["all"].map(dataSet => {
+			const combinedData = datasets["all"].url.map(dataSet => {
 					return d3.csv(dataSet, (d: any) =>
 						({
 							city: d.City,
@@ -31,7 +29,7 @@
 			return loadedData.flat();
 
 		} else {
-			return d3.csv(datasets[selectedDataset][0], (d: any) => ({
+			return d3.csv(datasets[selectedDataset].url[0], (d: any) => ({
 					city: d.City,
 					country: d.Country,
 					mainPollutant: d['Main pollutant'],
@@ -55,7 +53,7 @@
 	<p>loading data...</p>
 {:then data}
 	<!-- promise was fulfilled or not a Promise -->
-	<h2>AQI Chart for { selectedDataset==="all" ? "All Stations" : data[0].stationName ?? data[0].city}</h2>
+	<h2>Part One: AQI Chart for { selectedDataset==="all" ? "All Stations" : data[0].stationName ?? data[0].city}</h2>
 	<div>
 		<label class="region-selector">
 			<select class="region-selector" bind:value={selectedDataset}>
@@ -88,7 +86,6 @@
 				<span style="padding: 5px">
 					<Chip name={c.name} colour={c.color} rMax={c.max} rMin={c.min}/>
 				</span>
-
 			{/each}
 	</div>
 	
@@ -99,10 +96,6 @@
 
 
 <style>
-	* {
-		font-family: sans-serif;
-	}
-
 	.region-selector{
 		align-self: center;
 	}
