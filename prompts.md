@@ -22,10 +22,10 @@ This is meant for any code snippets that were completely or partially generated 
     const p90 = d3.quantile(usAqiValues, 0.90);
     ```
 
-- ***is possible to do a background map of a state in the US in d3 *** 
+- ***"is possible to do a background map of a state in the US in d3"*** 
 
 
 
-[//]: # (Link to chat: )
-
+[//]: # (Link to chats: )
 [//]: # (https://chatgpt.com/share/68e4b9f0-0c64-8008-adb8-9fc7eb23fda5)
+[//]: # (https://chatgpt.com/share/68f4507c-fd80-8008-80a7-d0690b78c9ea)
