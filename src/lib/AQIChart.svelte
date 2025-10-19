@@ -2,19 +2,7 @@
 	import * as d3 from 'd3';
 	import { onMount } from 'svelte';
 	import {colours} from '$lib/constants';
-
-	interface Item {
-		city: string;
-		country: string;
-		mainPollutant: string;
-		pm25: number;
-		state: string;
-		stationName: string;
-		timestamp: Date;
-		usAqi: number;
-		low : number;
-		high : number;
-	}
+	import type {Item} from '$lib/types'
 
 	// properties this component accepts
 	let { data , url, showRawData=false}: { data: Item[] , url : string, showRawData: Boolean} = $props();
@@ -183,14 +171,11 @@
 	svg {
 		font-family: sans-serif;
 		overflow: visible;
-		.legend span {
-			aspect-ratio: 1 / 1;
-			background: var(--color);
-		}
+
+		/*.legend span {*/
+		/*	aspect-ratio: 1 / 1;*/
+		/*	background: var(--color);*/
+		/*}*/
 	}
 
-	legend span {
-		aspect-ratio: 1 / 1;
-		background: var(--color);
-	}
 </style>
