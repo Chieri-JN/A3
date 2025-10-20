@@ -1,3 +1,4 @@
+// All possible fields
 export interface Item{
 	city: string;
 	country: string;
@@ -9,5 +10,11 @@ export interface Item{
 	usAqi: number;
 	low : number;
 	high : number;
+	// possibly null
+	Ozone: number;
+	NO2: number;
+	SO2: number;
+	CO: number;
+	pm10: number;
 }
 

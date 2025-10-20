@@ -158,7 +158,7 @@
 
 	onMount(makeGraph);
 	// just for debugging; can be removed
-	$inspect(data);
+	// $inspect(data);
 
 </script>
 

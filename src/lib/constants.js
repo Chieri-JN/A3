@@ -67,48 +67,75 @@ export 	const datasets = {
 	}
 };
 
-export const stations = [
+export const stations  = [
 	{
 		name : 'Avalon' ,
-		id : "avalon"
+		id : "avalon",
+		city : "Avalon",
+		long : -80.0675554,
+		lat: 40.5009019
 	},
 	{
 		name :"Glassport High Street",
-		id : "glassport_high_street"
+		id : "glassport_high_street",
+		city : "Glassport",
+		long: -79.888693,
+		lat : 40.326919
 	},
 	{
 		name :"North Braddock",
-		id : 'north_braddock'
+		id : 'north_braddock',
+		city : "Braddock",
+		long: -79.856389,
+		lat : 40.405000
 	},
 	{
 		name :"Lawrenceville",
-		id :  "lawrenceville"
+		id :  "lawrenceville",
+		city : "Pittsburgh",
+		long: -79.9609,
+		lat : 40.4698
 	},
 	{
 		name :"Parkway East",
-		id : "parkway_east_near_road"
+		id : "parkway_east_near_road",
+		city : "Pittsburgh",
+		//long : -79.8386593,
+		long: -79.755056, 		// according to the AI overview
+		//lat : 40.3956247
+		lat : 40.438692 		// according to the AI overview from this
 	},
 	{
 		name :"Manchester",
-		id : "manchester"
+		id : "manchester",
+		city : "Millvale",
+		long:  -79.9784,
+		lat : 40.4801
 	},
 	{
 		name :"Liberty (SAHS)" ,
-		id : "liberty_sahs"
+		id : "liberty_sahs",
+		city : "McKeesport",
+		long: -79.842663296,
+		lat : 40.339665308
 	},
 	{
 		name : "USA Pennsylvania Pittsburgh",
-		id : "usa_pennsylvania_pittsburgh"
+		id : "usa_pennsylvania_pittsburgh",
+		city : "Pittsburgh",
+		long : -79.9972, // not quite sure of the accuracy
+		lat: 40.4387
 	},
 	{
 		name : "All stations",
-		id : "all"
+		id : "all",
+		city : "",
+		long: 0,
+		lat : 0
 	}
 ];
 
-// export const marks = [
-// 	avalon: {long }
-// ]
+
 
 export const marks = new Map;
 

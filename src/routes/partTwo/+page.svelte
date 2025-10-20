@@ -36,7 +36,13 @@
 							state: d.State,
 							stationName: d['Station name'],
 							timestamp: new Date(d['Timestamp(UTC)']),
-							usAqi: +d['US AQI']
+							usAqi: +d['US AQI'],
+							// possible pollutants if present
+							Ozone: d.Ozone ? +d['Ozone'] : null,
+							NO2: d.NO2 ? +d['NO2'] : null,
+							SO2: d.SO2 ? +d['SO2'] : null,
+							CO: d.CO ? +d['C0'] : null,
+							pm10: d.PM10 ? +d['PM10'] : null,
 						}
 					))
 			});
@@ -52,7 +58,13 @@
 					state: d.State,
 					stationName: d['Station name'],
 					timestamp: new Date(d['Timestamp(UTC)']),
-					usAqi: +d['US AQI']
+					usAqi: +d['US AQI'],
+					// possible pollutants if present
+					Ozone: d.Ozone ? +d['Ozone'] : null,
+					NO2: d.NO2 ? +d['NO2'] : null,
+					SO2: d.SO2 ? +d['SO2'] : null,
+					CO: d.CO ? +d['C0'] : null,
+					pm10: d.PM10 ? +d['PM10'] : null,
 				}
 			));
 
@@ -64,7 +76,13 @@
 					state: d.State,
 					stationName: d['Station name'],
 					timestamp: new Date(d['Timestamp(UTC)']),
-					usAqi: +d['US AQI']
+					usAqi: +d['US AQI'],
+					// possible pollutants if present
+					Ozone: d.Ozone ? +d['Ozone'] : null,
+					NO2: d.NO2 ? +d['NO2'] : null,
+					SO2: d.SO2 ? +d['SO2'] : null,
+					CO: d.CO ? +d['C0'] : null,
+					pm10: d.PM10 ? +d['PM10'] : null,
 				}
 			));
 
@@ -80,7 +98,7 @@
 <h1>
 	Part Two : Interactive Data Visualization
 </h1>
-<div>
+<div style="padding-bottom: 1em">
 	<label class="interaction-selector">
 <!--		<select class="interaction-selector" bind:value={showAllData}>-->
 <!--			<option value={true}>&#45;&#45;Compare All Stations&#45;&#45;</option>-->
@@ -95,6 +113,7 @@
 		Compare Two Stations
 	</label>
 </div>
+
 {#if showAllData}
 	{#await data}
 		<p>loading data...</p>
@@ -115,9 +134,9 @@
 			<span>
 				<label class="region-selector">
 					Station 1:
-				<select class="region-selector" bind:value={selectedDataset1}>
+				<select class="temp" bind:value={selectedDataset1}>
 					{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset2.toString()) as s}
-						<option value ={s.id} >
+						<option class="temp" value ={s.id} >
 							{s.name}
 						</option>
 					{/each}
@@ -126,9 +145,9 @@
 
 				<label class="region-selector">
 					Station 2:
-				<select class="region-selector" bind:value={selectedDataset2}>
+				<select  class="temp" bind:value={selectedDataset2}>
 					{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset1.toString()) as s}
-						<option value ={s.id} >
+						<option class="temp" value ={s.id} >
 							{s.name}
 						</option>
 					{/each}
@@ -155,10 +174,18 @@
 {/if}
 
 
+<style>
+	.region-selector {
+			padding-right: 1em;
+	}
 
-<!--
-Part Two:
+	.temp {
+			max-width: fit-content;
+			text-align: center;
+	}
 
+	.interaction-selector {
 
+	}
 
--->
+</style>
