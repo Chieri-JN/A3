@@ -21,20 +21,15 @@
 	let LONG = $state(0);
 
 	let svgElem : SVGElement;
-
 	let tooltipElem: HTMLDivElement;
-
 
 	const width = 600;
 	const height = 400;
 	function drawMap(us) {
 		const counties = topojson.feature(us, us.objects.counties).features;
-		// county = topojson.feature(us, us.objects.counties).features.find(d => d.id === "42003");
-		const county =  counties.find(d => d.id === "42003");
+		const county =  counties.find(d => d.properties.name === "Allegheny");
 		console.log("County:", county);
-		// projection.fitSize([600, 400], county[0]);
-		// let projection = geoMercator().fitSize([600, 400], county);
-		let projection = geoMercator().center([-79.95, 40.44])  // center on Pittsburgh
+		let projection = geoMercator().center([-79.95, 40.44])
 			.scale(28500)
 			.translate([width / 2, height / 2]);
 
@@ -49,47 +44,31 @@
 			.datum(county)
 			.attr("d", d => path(d))
 			.attr("stroke", "black")
+			.attr("stroke-width", "5")
 			.attr("fill", "none");
-
-		// let tooltip = d3.select(tooltipElem)
-		// let tooltip = d3.select(svgElem)
-		// 	.append("div")
-		// 	.attr("class", "tooltip")
-		// 	.style("opacity", 1)
-		// 	.style("background-color", "white")
-		// 	.style("border", "solid")
-		// 	.style("border-width", "2px")
-		// 	.style("border-radius", "5px")
-		// 	.style("padding", "5px")
-		// 	.text("I'm a circle!");
-		//
-		let mouseover = function(event, d) {
-			tooltip.style("opacity", 1)
-			// console.log("OVREOVERO");
-				const [mx, my] = d3.pointer(event);
-				tooltip
-					.attr("x", mx)
-					.attr("y", my)
-					// .text(`a LONG: ${d.long} | LAT: ${d.lat}`)
-					.html(`Station: ${d.name} \n LONG:${d.long} \nLAT : ${d.lat}`)
-		}
-
-		let mouseleave = function(event, d) {
-			tooltip.style("opacity", 0)
-		}
 
 		let mouseenter = function (event, d) {
 			const [mx, my] = d3.pointer(event);
-			LAT	= d.lat;
-			LONG = d.long;
+			LAT	= d.lat.toPrecision(4);
+			LONG = d.long.toPrecision(4);
 			const textT = `Station: ${d.name} \n LONG:${d.long} \nLAT : ${d.lat}`;
 			// language=HTML
-			const tooltipText = `
-			  <strong>Station:</strong>  ${d.name}
+			// const tooltipText = `
+			//   <strong>Station:</strong> ${d.name}
+			//   <br>
+			//   <strong>LONG:</strong> ${d.long}
+			//   <br>
+			//   <strong>LAT :</strong> ${d.lat}`;
+
+			tooltipElem.innerHTML =
+				`<strong>Station:</strong>  ${d.name}
 			  <br>
-			  <strong>LONG:</strong>: :${d.long}
+			  <strong>LONG:</strong> ${d.long}
 			  <br>
-			  <strong>LAT :</strong>: ${d.lat}`;
+			  <strong>LAT :</strong> ${d.lat}`;
+
+			// tooltipElem.style.top = event.offsetX
+			// tooltipElem.style.left = event.offsetY
 
 			// tooltip
 				// .attr("transform", `translate(${mx+20}, ${my-100})`)
@@ -101,41 +80,17 @@
 				// // .style("top", `${my}px`)
 				// // .style("left", `${mx}px`)
 				// .html(tooltipText);
-				//
-				// .append("div")
-				// .selectAll("tspan")
-				// .attr("class", "tooltip")
-				// .style("opacity", 1)
-				// .style("background-color", "white")
-				// .style("border", "solid")
-				// .style("border-width", "2px")
-				// .style("border-radius", "5px")
-				// .style("padding", "5px")
-				// .text(textT);
 
-			tooltip
-				.attr("transform", `translate(${mx+20}, ${my-100})`)
-				.selectAll("tspan")
-				.data(textT.split("\n"))
-				.join("tspan")
-				.attr("dy", "1em")
-				.attr("x", "0px")
-				.style("background-color", "white")
-				.text((text) => text );
-		}
-
-		let mousemove = function(event, d) {
-			tooltip
-				// .html(d.name + "<br>Long:" + "long: " + d.long + "<br>Lat" + "lat: " + d.lat)
-				.html(`<strong>${d.name}</strong><br>Longitude: ${d.long}<br>Latitude: ${d.lat}`)
-				// .style("left", (event.x)/2 + "px")
-				// .style("top", (event.y)/2 - 30 + "px")
-				.style("left", event.offsetX + 10 + "px")
-				.style("top", event.offsetY + 10 + "px");
-			// console.log("MOVE");
-			LAT	= d.lat;
-			LONG = d.long;
-			console.log(d.name, d.long, d.lat);
+			// tooltip
+			// 	.attr("transform", `translate(${mx+20}, ${my-100})`)
+			// 	.selectAll("tspan")
+			// 	.data(textT.split("\n"))
+			// 	.join("tspan")
+			// 	.attr("dy", "1em")
+			// 	.attr("x", "0px")
+			// 	.style("background-color", "white")
+			// 	.text((text) => text )
+			// 	.html(`<strong>${d.name}</strong><br>Longitude: ${d.long}<br>Latitude: ${d.lat}`)
 		}
 
 		const g = svg
@@ -160,35 +115,10 @@
 			.attr("cy", (d) => projection([d.long, d.lat])[1])
 			.attr("r", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? 10 : 5)
 			.attr("fill", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "red" : "black" )
-			// .on("mouseover", mouseover)
 			.on("mouseenter", mouseenter)
-			.on("mouseout", () => {
-				tooltip.text("");
-			});
-
-
-		// svg.append("g")
-		// 	.selectAll("circle")
-		// 	.data(cleanedStations)
-		// 	.attr("id", "stationPoint")
-		// 	.join("circle")
-		// 	.attr("cx", (d) => projection([d.long, d.lat])[0])
-		// 	.attr("cy", (d) => projection([d.long, d.lat])[1])
-		// 	.attr("r", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? 10 : 5)
-		// 	.attr("fill", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "red" : "black" )
-		// 	.on("mouseover", mouseover)
-		// 	.on("mousemove", mousemove)
-		// 	.on("mouseleave", mouseleave);
-
-
-
-		// const tooltip = d3.selectAll("#circle")
-		// 	.append("div")
-		// 	.style("position", "absolute")
-		// 	.style("visibility", "hidden")
-		// 	.text("I'm a circle!");
-
-
+			.on("mouseout", () => {tooltip.text("");})
+			.on("mouseover", (event, d) => {event.target.style.fill=((selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "#b30000" : "#5b73a4")})
+			.on("mouseleave", (event, d) => {event.target.style.fill= ((selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "red" : "black")});
 	}
 
 	$effect(() => {
@@ -215,14 +145,13 @@
 	});
 
 </script>
-
+<p>Hover points to see details</p>
 <div class="map">
+	<div class="tooltip" bind:this={tooltipElem}></div>
 	<svg bind:this={svgElem} width="600" height="400"  >
 	</svg>
-	<div class="tooltip"></div>
 </div>
-<h1>LAT: {LAT}</h1>
-<h1>LONG: {LONG}</h1>
+
 
 <style>
 		.map {
@@ -230,16 +159,20 @@
 		}
 
 
-    .tooltip {
+
+		.tooltip {
         font: sans-serif 12pt;
         background: #eeeeeeee;
         pointer-events: none;
-        border-radius: 2px;
+        border-radius: 4px;
+				border-width: 4px;
+				border-color: #5577bb;
+        max-width: fit-content;
         padding: 5px;
-        position: absolute;
+        /*position: absolute;*/
         top: 0px;
         left: 0px;
-        z-index: 1;
+        z-index: 1
 
-    }
+		}
 </style>

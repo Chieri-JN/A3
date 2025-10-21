@@ -136,10 +136,12 @@
 			svg.append('g')
 				.selectAll("dot")
 				.data(data)
+				.join("circle")
 				.attr("cx", d => x(d.timestamp))
 				.attr("cy", d => y(d.usAqi))
 				.attr("r", 1.5)
 				.style("fill",  "#000")
+			console.log("AAAAAAH HAGAGAGHA")
 		}
 	}
 

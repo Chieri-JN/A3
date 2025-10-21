@@ -179,7 +179,7 @@
         font-family: sans-serif;
         overflow: visible;
         white-space: nowrap;
-				padding-bottom: 2em;
+				padding-bottom: 14em;
 
     }
 
