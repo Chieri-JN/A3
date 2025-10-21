@@ -7,8 +7,8 @@
 	// properties this component accepts
 	let { data , url, showRawData=false}: { data: Item[] , url : string, showRawData: Boolean} = $props();
 
-	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
-	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
+	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp ?? new Date());
+	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp ?? new Date());
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
 	function getColour(val : number) {
@@ -136,9 +136,8 @@
 			svg.append('g')
 				.selectAll("dot")
 				.data(data)
-				.join("circle")
-				.attr("cx", function (d) { return x(d.timestamp); } )
-				.attr("cy", function (d) { return y(d.usAqi); } )
+				.attr("cx", d => x(d.timestamp))
+				.attr("cy", d => y(d.usAqi))
 				.attr("r", 1.5)
 				.style("fill",  "#000")
 		}

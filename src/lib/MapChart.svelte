@@ -1,11 +1,9 @@
 <script lang="ts">
-	// https://github.com/topojson/us-atlas
-	// https://github.com/d3/d3-geo
-	// https://observablehq.com/@mbostock/u-s-state-map
-	// TODO: https://observablehq.com/@d3/u-s-map
-	// TODO: https://observablehq.com/@jeantimex/us-state-county-map
-
-	// based off of this example https://svelte.dev/playground/33d086ab38fb42c48c39bd5f191fb890?version=5.41.0
+	// based off of these examples:
+	/**
+	 * https://observablehq.com/@john-guerra/how-to-add-a-tooltip-in-d3
+	 * https://svelte.dev/playground/33d086ab38fb42c48c39bd5f191fb890?version=5.41.0
+	 */
 
 	import { onMount } from 'svelte';
 	import * as topojson from 'topojson-client';
@@ -19,7 +17,8 @@
 	console.log("Selected Stations:", selectedStations);
 
 	const cleanedStations = stations.filter(s => s.id!=="all");
-
+	let LAT = $state(0);
+	let LONG = $state(0);
 
 	let svgElem : SVGElement;
 
@@ -52,36 +51,107 @@
 			.attr("stroke", "black")
 			.attr("fill", "none");
 
-		let tooltip = d3.select(tooltipElem)
-			.append("div")
-			.attr("class", "tooltip")
-			.style("opacity", 1)
-			.style("background-color", "white")
-			.style("border", "solid")
-			.style("border-width", "2px")
-			.style("border-radius", "5px")
-			.style("padding", "5px")
-			.text("I'm a circle!");
-
-
+		// let tooltip = d3.select(tooltipElem)
+		// let tooltip = d3.select(svgElem)
+		// 	.append("div")
+		// 	.attr("class", "tooltip")
+		// 	.style("opacity", 1)
+		// 	.style("background-color", "white")
+		// 	.style("border", "solid")
+		// 	.style("border-width", "2px")
+		// 	.style("border-radius", "5px")
+		// 	.style("padding", "5px")
+		// 	.text("I'm a circle!");
+		//
 		let mouseover = function(event, d) {
 			tooltip.style("opacity", 1)
 			// console.log("OVREOVERO");
+				const [mx, my] = d3.pointer(event);
+				tooltip
+					.attr("x", mx)
+					.attr("y", my)
+					// .text(`a LONG: ${d.long} | LAT: ${d.lat}`)
+					.html(`Station: ${d.name} \n LONG:${d.long} \nLAT : ${d.lat}`)
 		}
-		let mousemove = function(event, d) {
-			tooltip
-				.html(d.name + "<br>" + "long: " + d.long + "<br>" + "lat: " + d.lat)
-				.style("left", (event.x)/2 + "px")
-				.style("top", (event.y)/2 - 30 + "px")
-			// console.log("MOVE");
-			console.log(d.name, d.long, d.lat);
-		}
+
 		let mouseleave = function(event, d) {
 			tooltip.style("opacity", 0)
 		}
 
+		let mouseenter = function (event, d) {
+			const [mx, my] = d3.pointer(event);
+			LAT	= d.lat;
+			LONG = d.long;
+			const textT = `Station: ${d.name} \n LONG:${d.long} \nLAT : ${d.lat}`;
+			// language=HTML
+			const tooltipText = `
+			  <strong>Station:</strong>  ${d.name}
+			  <br>
+			  <strong>LONG:</strong>: :${d.long}
+			  <br>
+			  <strong>LAT :</strong>: ${d.lat}`;
 
-		svg.append("g")
+			// tooltip
+				// .attr("transform", `translate(${mx+20}, ${my-100})`)
+				// .selectAll("tooltip")
+				// .data(tooltipText.split("\n"))
+				// .join("tspan")
+				// .attr("dy", "1em")
+				// .attr("x", "0px")
+				// // .style("top", `${my}px`)
+				// // .style("left", `${mx}px`)
+				// .html(tooltipText);
+				//
+				// .append("div")
+				// .selectAll("tspan")
+				// .attr("class", "tooltip")
+				// .style("opacity", 1)
+				// .style("background-color", "white")
+				// .style("border", "solid")
+				// .style("border-width", "2px")
+				// .style("border-radius", "5px")
+				// .style("padding", "5px")
+				// .text(textT);
+
+			tooltip
+				.attr("transform", `translate(${mx+20}, ${my-100})`)
+				.selectAll("tspan")
+				.data(textT.split("\n"))
+				.join("tspan")
+				.attr("dy", "1em")
+				.attr("x", "0px")
+				.style("background-color", "white")
+				.text((text) => text );
+		}
+
+		let mousemove = function(event, d) {
+			tooltip
+				// .html(d.name + "<br>Long:" + "long: " + d.long + "<br>Lat" + "lat: " + d.lat)
+				.html(`<strong>${d.name}</strong><br>Longitude: ${d.long}<br>Latitude: ${d.lat}`)
+				// .style("left", (event.x)/2 + "px")
+				// .style("top", (event.y)/2 - 30 + "px")
+				.style("left", event.offsetX + 10 + "px")
+				.style("top", event.offsetY + 10 + "px");
+			// console.log("MOVE");
+			LAT	= d.lat;
+			LONG = d.long;
+			console.log(d.name, d.long, d.lat);
+		}
+
+		const g = svg
+			.append("g")
+			.attr("transform", `translate(${0}, ${0})`);
+
+		const gPoints = g.append("g").attr("class", "gPoints");
+
+		// Let's create a tooltip SVG text element
+		const tooltip = g
+			.append("text")
+			.attr("class", "tooltip")
+			.attr("fill", "black")
+			.style("pointer-events", "none");
+
+		gPoints
 			.selectAll("circle")
 			.data(cleanedStations)
 			.attr("id", "stationPoint")
@@ -90,9 +160,25 @@
 			.attr("cy", (d) => projection([d.long, d.lat])[1])
 			.attr("r", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? 10 : 5)
 			.attr("fill", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "red" : "black" )
-			.on("mouseover", mouseover)
-			.on("mousemove", mousemove)
-			.on("mouseleave", mouseleave);
+			// .on("mouseover", mouseover)
+			.on("mouseenter", mouseenter)
+			.on("mouseout", () => {
+				tooltip.text("");
+			});
+
+
+		// svg.append("g")
+		// 	.selectAll("circle")
+		// 	.data(cleanedStations)
+		// 	.attr("id", "stationPoint")
+		// 	.join("circle")
+		// 	.attr("cx", (d) => projection([d.long, d.lat])[0])
+		// 	.attr("cy", (d) => projection([d.long, d.lat])[1])
+		// 	.attr("r", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? 10 : 5)
+		// 	.attr("fill", d => (selectedStations.find(s => d.name===s) || selectedStations[0]==="All stations") ? "red" : "black" )
+		// 	.on("mouseover", mouseover)
+		// 	.on("mousemove", mousemove)
+		// 	.on("mouseleave", mouseleave);
 
 
 
@@ -133,10 +219,27 @@
 <div class="map">
 	<svg bind:this={svgElem} width="600" height="400"  >
 	</svg>
+	<div class="tooltip"></div>
 </div>
+<h1>LAT: {LAT}</h1>
+<h1>LONG: {LONG}</h1>
 
 <style>
 		.map {
 				align-items: center;
 		}
+
+
+    .tooltip {
+        font: sans-serif 12pt;
+        background: #eeeeeeee;
+        pointer-events: none;
+        border-radius: 2px;
+        padding: 5px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        z-index: 1;
+
+    }
 </style>

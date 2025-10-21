@@ -9,7 +9,6 @@
 	import AllData from '$lib/AllData.svelte';
 
 
-
 	let selectedDataset1: keyof typeof datasets = $state('lawrenceville');
 	let selectedDataset2: keyof typeof datasets = $state('avalon');
 
