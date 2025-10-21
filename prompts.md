@@ -114,10 +114,3 @@ ___
 ##
 ___
 
-
-
-
-
-Link to chats:\
-https://chatgpt.com/share/68e4b9f0-0c64-8008-adb8-9fc7eb23fda5
-https://chatgpt.com/share/68f4507c-fd80-8008-80a7-d0690b78c9ea

@@ -16,19 +16,19 @@
 
 <h2>Comparing stations {nameOne} and {nameTwo}</h2>
 <div>
-	<MapChart selectedStations={[nameOne,nameTwo]}/>
+	<MapChart selectedStations={[nameOne,nameTwo]} 	data1={data1} data2={data2}/>
 </div>
-<div>
-			<span class="charts">
+<!--<div>-->
+<!--			<span class="charts">-->
 
-				<div class="chart">
-					<BrushChart data={data1} stationName={nameOne} showRawData={true} />
-				</div>
-				<div class="chart">
-					<BrushChart data={data2} stationName={nameTwo} showRawData={true}/>
-				</div>
-			</span>
-</div>
+<!--				<div class="chart">-->
+<!--					<BrushChart data={data1} stationName={nameOne} showRawData={true} />-->
+<!--				</div>-->
+<!--				<div class="chart">-->
+<!--					<BrushChart data={data2} stationName={nameTwo} showRawData={true}/>-->
+<!--				</div>-->
+<!--			</span>-->
+<!--</div>-->
 
 <!--<pre>-->
 <!--{JSON.stringify(data1[0], null, 2)}-->

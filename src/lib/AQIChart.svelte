@@ -148,7 +148,7 @@
 		if (svgElem) {
 			const svg = d3.select(svgElem);
 			svg.selectAll('circle').remove();
-			svg.selectAll("rect").remove();
+			svg.selectAll("dot").remove();
 			makeGraph();
 		}else {
 			return;

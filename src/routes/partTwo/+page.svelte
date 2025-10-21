@@ -9,6 +9,7 @@
 	import AllData from '$lib/AllData.svelte';
 
 
+
 	let selectedDataset1: keyof typeof datasets = $state('lawrenceville');
 	let selectedDataset2: keyof typeof datasets = $state('avalon');
 
@@ -119,6 +120,7 @@
 		<p>loading data...</p>
 	{:then data}
 		<div  style="padding-bottom: 100px">
+			<MapChart/>
 			<AllData data={data}/>
 		</div>
 	{:catch error}
@@ -131,32 +133,35 @@
 		<p>loading data...</p>
 	{:then [data1, data2]}
 		<div  style="padding-bottom: 100px">
-			<span>
-				<label class="region-selector">
-					Station 1:
-				<select class="temp" bind:value={selectedDataset1}>
-					{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset2.toString()) as s}
-						<option class="temp" value ={s.id} >
-							{s.name}
-						</option>
-					{/each}
-				</select>
-				</label>
 
-				<label class="region-selector">
-					Station 2:
-				<select  class="temp" bind:value={selectedDataset2}>
-					{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset1.toString()) as s}
-						<option class="temp" value ={s.id} >
-							{s.name}
-						</option>
-					{/each}
-				</select>
-				</label>
-			</span>
+			<span class= "rs-span">
+			<div>
+				<span  >
+					<label class="region-selector">
+						Station 1:
+					<select class="temp" bind:value={selectedDataset1}>
+						{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset2.toString()) as s}
+							<option class="temp" value ={s.id} >
+								{s.name}
+							</option>
+						{/each}
+					</select>
+					</label>
 
+					<label class="region-selector">
+						Station 2:
+					<select  class="temp" bind:value={selectedDataset2}>
+						{#each stations.filter(sn => sn.id!=="all" && sn.id!==selectedDataset1.toString()) as s}
+							<option class="temp" value ={s.id} >
+								{s.name}
+							</option>
+						{/each}
+					</select>
+					</label>
+				</span>
+			</div>
+<!--				<MapChart selectedStations={[getNameFromID(selectedDataset1.toString()),getNameFromID(selectedDataset2.toString())]}/>-->
 
-			<span>
 
 			</span>
 
@@ -176,6 +181,7 @@
 
 <style>
 	.region-selector {
+			/*position: absolute;*/
 			padding-right: 1em;
 	}
 
@@ -185,7 +191,13 @@
 	}
 
 	.interaction-selector {
+	}
 
+	.rs-span {
+      padding-left: 0.75em;
+      padding-right: 0.75em;
+      display: inline-flex;
+      gap: 10px;
 	}
 
 </style>

@@ -12,9 +12,9 @@
 
 
 
-<div>
-	<MapChart/>
-</div>
+<!--<div>-->
+<!--	<MapChart/>-->
+<!--</div>-->
 <div>
 	<div style="padding-bottom: 1em">
 		<label for="ShowRawData">
