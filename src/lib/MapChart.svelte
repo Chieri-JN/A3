@@ -16,6 +16,8 @@
 	let { selectedStations=["All stations"], data1, data2 } : {selectedStations : string[], data1:Item[], data2:Item[]} = $props()
 	console.log("Selected Stations:", selectedStations);
 
+
+
 	const cleanedStations = stations.filter(s => s.id!=="all");
 	let LAT = $state(0);
 	let LONG = $state(0);
@@ -23,7 +25,7 @@
 	let svgElem : SVGElement;
 	let tooltipElem: HTMLDivElement;
 
-	const width = 600;
+	const width = 500;
 	const height = 400;
 	function drawMap(us) {
 		const counties = topojson.feature(us, us.objects.counties).features;
@@ -148,7 +150,7 @@
 <p>Hover points to see details</p>
 <div class="map">
 	<div class="tooltip" bind:this={tooltipElem}></div>
-	<svg bind:this={svgElem} width="600" height="400"  >
+	<svg bind:this={svgElem} width="400" height="400"  >
 	</svg>
 </div>
 

@@ -5,6 +5,7 @@
 	import AQIChart from '$lib/AQIChart.svelte';
 	import { colours } from '$lib/constants';
 	import Chip from '$lib/Chip.svelte';
+	import SelectionChart from '$lib/SelectionChart.svelte';
 
 	let { data } : {data : Item[]} = $props();
 	let showRawData = $state(false);
@@ -24,9 +25,6 @@
 			<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
 		</label>
 	</div>
-	<div>
-		<BrushChart data={data} stationName="all Stations" isAllData={true}  showRawData={showRawData}/>
-	</div>
 	<div class="legend">
 		US AQI:
 		{#each colours as c}
@@ -35,7 +33,11 @@
 				</span>
 		{/each}
 	</div>
+	<div>
+		<SelectionChart data={data} stationName="all Stations" isAllData={true}  showRawData={showRawData}/>
+	</div>
 </div>
+
 
 
 <!--<pre>-->

@@ -1,14 +1,20 @@
 <script lang="ts">
 	import * as d3 from 'd3';
-	import { onMount } from 'svelte';
-	import {colours} from '$lib/constants';
-	import type {Item} from '$lib/types'
+	import  {onMount}  from 'svelte';
+	import {colours} from '$lib/constants.js';
+	import type {Item} from './types'
 
-	// properties this component accepts
-	let { data , url, showRawData=false}: { data: Item[] , url : string, showRawData: Boolean} = $props();
+	let {
+		data,
+		stationName="PlaceHolder",
+		isAllData=false,
+		showRawData=false,
+		selectionRange=[-1,-1]
+	}
+		: {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean, selectionRange:number[]}  = $props();
 
-	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp ?? new Date());
-	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp ?? new Date());
+	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
+	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
 	function getColour(val : number) {
@@ -19,7 +25,7 @@
 		} else if (101 <= val && val <= 150 ) {
 			return colours[2].color;
 		} else if (151 <= val && val <= 200 ) {
-			return colours[3].color;		
+			return colours[3].color;
 		} else if (201 <= val && val <= 300 ) {
 			return colours[4].color;
 		} else if (301 <= val ) {
@@ -49,16 +55,16 @@
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
 		const margin = {top: 5, right: 30, bottom: 30, left: 60},
-			width = 900 - margin.left - margin.right,
-			height = 400 - margin.top - margin.bottom;
+			width = (isAllData ?  1000 : 700) - margin.left - margin.right,
+			height = (isAllData ? 500 : 350) - margin.top - margin.bottom;
 
 		d3.select(svgElem)
 			.selectAll("*")
 			.remove();
-			
+
 		const svg = d3.select(svgElem)
 			.append("svg")
-			.attr("width", width + margin.left + margin.right)
+			.attr("width", width)
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -102,10 +108,13 @@
 			.join("rect")
 			.attr("class", "aqiColors")
 			.attr("x", 0)
+			.attr("stroke-color", "white")
+			.attr("stroke-width", 3)
+			// .attr("stroke" (d.min ))
 			.attr("y", d => band(d.max ?? maxAQI))
 			.attr("width", width)
 			.attr("height", d => band(d.min-1 < 0 ? 0 : d.min-1 ) -band(d.max ?? maxAQI))
-			.style("fill",  d => d.color)
+			.style("fill",  d => getColour(d.min))
 			.attr("opacity", 0.5);
 
 		const eightyP = d3.area<Item>()
@@ -131,25 +140,24 @@
 			.attr("stroke-width", 2)
 			.attr("d", line)
 
-		// show raw data if toggle 
-		if (showRawData) {
-			svg.append('g')
-				.selectAll("dot")
-				.data(data)
-				.join("circle")
-				.attr("cx", d => x(d.timestamp))
-				.attr("cy", d => y(d.usAqi))
-				.attr("r", 1.5)
-				.style("fill",  "#000")
-			// console.log("AAAAAAH HAGAGAGHA")
-		}
+		// show raw data if toggle
+		// if (showRawData) {
+		svg.append('g')
+			.selectAll("dot")
+			.data(data)
+			.join("circle")
+			.attr("cx", function (d) { return x(d.timestamp); } )
+			.attr("cy", function (d) { return y(d.usAqi); } )
+			.attr("r", 2.5)
+			.style("fill",  "#000")
+		// }
 	}
 
 	$effect(() => {
 		if (svgElem) {
 			const svg = d3.select(svgElem);
 			svg.selectAll('circle').remove();
-			svg.selectAll("dot").remove();
+			svg.selectAll("rect").remove();
 			makeGraph();
 		}else {
 			return;
@@ -162,21 +170,41 @@
 	// $inspect(data);
 
 </script>
-
-<div>
+{#if {isAllData}}
+	<h2> {stationName}</h2>
 	<svg bind:this={svgElem} width="600" height="320"  >
 	</svg>
-</div>
+{:else}
+	<div class="content">
+		<h2>Pollutants for {stationName}</h2>
+		<svg bind:this={svgElem} width="900" height="400"  >
+		</svg>
+	</div>
+{/if}
+
 
 <style>
-	svg {
-		font-family: sans-serif;
-		overflow: visible;
 
-		/*.legend span {*/
-		/*	aspect-ratio: 1 / 1;*/
-		/*	background: var(--color);*/
-		/*}*/
-	}
+    svg {
+        font-family: sans-serif;
+        overflow: visible;
+        white-space: nowrap;
+        /*padding-bottom: 14em;*/
+
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .content h2 {
+        margin: 0;
+        /*text-align: center;*/
+        white-space: nowrap;
+        padding-left: 90px;
+    }
 
 </style>

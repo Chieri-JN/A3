@@ -2,30 +2,30 @@
 	import * as d3 from 'd3';
 	import  {onMount}  from 'svelte';
 	import {colours} from '$lib/constants.js';
-	import type {Item} from './types'
+	import type {Item, Pollutant} from './types'
 
-	let {data, stationName="PlaceHolder", isAllData=false,  showRawData=false} : {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean}  = $props();
+	let {
+				data,
+				stationName="PlaceHolder",
+				isAllData=false,
+				showRawData=false,
+				showPollutants,
+				selectionRange=[-1,-1]
+		}
+		: {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean, showPollutants:Pollutant[], selectionRange:number[]}  = $props();
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
 
-	function getColour(val : number) {
-		if (0 <= val && val <= 50 ) {
-			return colours[0].color;
-		} else if (51 <= val && val <= 100 ){
-			return colours[1].color;
-		} else if (101 <= val && val <= 150 ) {
-			return colours[2].color;
-		} else if (151 <= val && val <= 200 ) {
-			return colours[3].color;
-		} else if (201 <= val && val <= 300 ) {
-			return colours[4].color;
-		} else if (301 <= val ) {
-			return colours[5].color;
-		} else {
-			return colours[6].color;
+	let getView = (d) => {
+		for (let i = 0; i < showPollutants.length ; i++) {
+			let p = showPollutants[i];
+			if (d.mainPollutant === p.name) {
+				return p.show
+			}
 		}
+		return false
 	}
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
@@ -48,8 +48,8 @@
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
 		const margin = {top: 5, right: 30, bottom: 30, left: 60},
-			width = (isAllData ?  1000 : 700) - margin.left - margin.right,
-			height = (isAllData ? 500 : 400) - margin.top - margin.bottom;
+			width = (isAllData ?  1000 : 800) - margin.left - margin.right,
+			height = (isAllData ? 500 : 350) - margin.top - margin.bottom;
 
 		d3.select(svgElem)
 			.selectAll("*")
@@ -57,7 +57,7 @@
 
 		const svg = d3.select(svgElem)
 			.append("svg")
-			.attr("width", width + margin.left + margin.right)
+			.attr("width", width)
 			.attr("height", height + margin.top + margin.bottom)
 			.append("g")
 			.attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -104,8 +104,8 @@
 			.attr("y", d => band(d.max ?? maxAQI))
 			.attr("width", width)
 			.attr("height", d => band(d.min-1 < 0 ? 0 : d.min-1 ) -band(d.max ?? maxAQI))
-			.style("fill",  d => getColour(d.min))
-			.attr("opacity", 0.5);
+			.style("fill",  d => d.color)
+			.attr("opacity", 0.25);
 
 		const eightyP = d3.area<Item>()
 			.x(d => x(d.timestamp))
@@ -131,24 +131,31 @@
 			.attr("d", line)
 
 		// show raw data if toggle
-		if (showRawData) {
+		// if (showRawData) {
+
 			svg.append('g')
 				.selectAll("dot")
 				.data(data)
 				.join("circle")
 				.attr("cx", function (d) { return x(d.timestamp); } )
 				.attr("cy", function (d) { return y(d.usAqi); } )
-				.attr("r", 1.5)
-				.style("fill",  "#000")
-		}
+				.attr("r", 2.5)
+				.style("visibility", d => (getView(d) ? "visible" : "hidden"))
+				.style("fill",  d => ((showPollutants.find(p => p.name === d.mainPollutant) ??{color : "black"})).color)
+		// }
 	}
+
+
 
 	$effect(() => {
 		if (svgElem) {
 			const svg = d3.select(svgElem);
 			svg.selectAll('circle').remove();
 			svg.selectAll("rect").remove();
+
 			makeGraph();
+			svg.selectAll("circle")
+				.style("visibility", d => (getView(d) ? "visible" : "hidden"));
 		}else {
 			return;
 		}
@@ -161,13 +168,13 @@
 
 </script>
 {#if {isAllData}}
-	<h2>Brush Chart for {stationName}</h2>
+	<h2> {stationName}</h2>
 	<svg bind:this={svgElem} width="600" height="320"  >
 	</svg>
 {:else}
 	<div class="content">
-		<h2>Brush Chart for {stationName}</h2>
-		<svg bind:this={svgElem} width="600" height="320"  >
+		<h2>Pollutants for {stationName}</h2>
+		<svg bind:this={svgElem} width="900" height="400"  >
 		</svg>
 	</div>
 {/if}
@@ -179,7 +186,7 @@
         font-family: sans-serif;
         overflow: visible;
         white-space: nowrap;
-				padding-bottom: 14em;
+				/*padding-bottom: 14em;*/
 
     }
 

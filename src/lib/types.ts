@@ -18,3 +18,12 @@ export interface Item{
 	pm10: number;
 }
 
+
+export interface Pollutant {
+	name: string,
+	id : string,
+	show: boolean,
+	title : string,
+	display : boolean,
+	color : string
+}
