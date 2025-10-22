@@ -7,17 +7,11 @@
 	import MapChart from '$lib/MapChart.svelte';
 	import AQIChart from '$lib/AQIChart.svelte';
 
-	let showO2 = $state(true);
-	let showNO2 = $state(true);
-	let showSO2 = $state(true);
-	let showCO = $state(true);
-	let showPM10 = $state(true);
-	let showPM25 = $state(true);
 	let rMin = $state(-1);
 	let rMax = $state(-1);
 
 	let Ozone= $state({ name: 'Ozone', id: "Ozone", show: true , title: 'Ozone', display: false, color: "#0066ff"})
-	let pm10 = $state({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#cc6699"})
+	let pm10 = $state({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#ff0066"})
 	let pm25 = $state({ name: 'PM2.5', id: "pm25", show: true, title: 'PM2.5', display: false , color: "#990099"})
 	let CO2  = $state({ name: 'C02', id: "CO2", show: true, title: 'Carbon Dioxide', display: false, color: "#0000cc" })
 	let SO2  = $state({ name: 'SO2', id: "SO2", show: true, title: 'Sulfur Dioxide', display: false , color: "#ffcc00"})
@@ -69,11 +63,12 @@
 					<div>
 							{#each pollutants.filter(pol => pol.display) as p}
 								<span class = "p-selector">
-								<div class = "cell" style="background-color: {p.color}"></div>
+
 									<input id={p.id} type="checkbox" bind:checked={p.show} name=""/>
 									<label for ={p.id}>
 											{p.title}
 									</label>
+									<div class = "cell" style="background-color: {p.color}"></div>
 								</span>
 							{/each}
 					</div>
@@ -98,18 +93,6 @@
 <!--				</span>-->
 	</div>
 </span>
-
-<!--<div>-->
-<!--			<span class="charts">-->
-
-<!--				<div class="chart">-->
-<!--					<BrushChart data={data1} stationName={nameOne} showRawData={true} />-->
-<!--				</div>-->
-<!--				<div class="chart">-->
-<!--					<BrushChart data={data2} stationName={nameTwo} showRawData={true}/>-->
-<!--				</div>-->
-<!--			</span>-->
-<!--</div>-->
 
 <!--<pre>-->
 <!--{JSON.stringify(data1[0], null, 2)}-->

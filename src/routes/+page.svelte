@@ -53,7 +53,7 @@
 	<p>loading data...</p>
 {:then data}
 	<!-- promise was fulfilled or not a Promise -->
-	<h2>Part One: AQI Chart for { selectedDataset==="all" ? "All Stations" : data[0].stationName ?? data[0].city}</h2>
+	<h1>Part One: AQI Chart for { selectedDataset==="all" ? "All Stations" : data[0].stationName ?? data[0].city}</h1>
 	<div>
 		<label class="region-selector">
 			<select class="region-selector" bind:value={selectedDataset}>
