@@ -7,11 +7,10 @@
 	let {
 		data,
 		stationName="PlaceHolder",
-		isAllData=false,
 		showRawData=false,
 		selectionRange=[-1,-1]
 	}
-		: {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean, selectionRange:number[]}  = $props();
+		: {data : Item[], stationName:string , showRawData: Boolean, selectionRange:number[]}  = $props();
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
@@ -55,8 +54,8 @@
 	let svgElem: SVGSVGElement;
 	function makeGraph() {
 		const margin = {top: 5, right: 30, bottom: 30, left: 60},
-			width = (isAllData ?  1000 : 700) - margin.left - margin.right,
-			height = (isAllData ? 500 : 350) - margin.top - margin.bottom;
+			width = (1000) - margin.left - margin.right,
+			height = ( 500) - margin.top - margin.bottom;
 
 		d3.select(svgElem)
 			.selectAll("*")
@@ -141,7 +140,7 @@
 			.attr("d", line)
 
 		// show raw data if toggle
-		// if (showRawData) {
+		if (showRawData) {
 		svg.append('g')
 			.selectAll("dot")
 			.data(data)
@@ -150,7 +149,7 @@
 			.attr("cy", function (d) { return y(d.usAqi); } )
 			.attr("r", 2.5)
 			.style("fill",  "#000")
-		// }
+		}
 	}
 
 	$effect(() => {
@@ -170,17 +169,10 @@
 	// $inspect(data);
 
 </script>
-{#if {isAllData}}
-	<h2> {stationName}</h2>
-	<svg bind:this={svgElem} width="600" height="320"  >
+	<h2>All the Stations</h2>
+	<svg bind:this={svgElem} width="600" height="400"  >
 	</svg>
-{:else}
-	<div class="content">
-		<h2>Pollutants for {stationName}</h2>
-		<svg bind:this={svgElem} width="900" height="400"  >
-		</svg>
-	</div>
-{/if}
+
 
 
 <style>

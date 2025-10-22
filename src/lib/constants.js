@@ -74,58 +74,67 @@ export const stations  = [
 		id : "avalon",
 		city : "Avalon",
 		long : -80.0675554,
-		lat: 40.5009019
+		lat: 40.5009019,
+		color: "#992000"
 	},
 	{
 		name :"Glassport High Street",
 		id : "glassport_high_street",
 		city : "Glassport",
 		long: -79.888693,
-		lat : 40.326919
+		lat : 40.326919,
+		color: "#ff0066"
 	},
 	{
 		name :"North Braddock",
 		id : 'north_braddock',
 		city : "Braddock",
 		long: -79.856389,
-		lat : 40.405000
+		lat : 40.405000,
+		color: "#990099"
 	},
 	{
 		name :"Lawrenceville",
 		id :  "lawrenceville",
 		city : "Pittsburgh",
 		long: -79.9609,
-		lat : 40.4698
+		lat : 40.4698,
+		color: "#0000cc"
 	},
 	{
 		name :"Parkway East",
 		id : "parkway_east_near_road",
 		city : "Pittsburgh",
 		//long : -79.8386593,
-		long: -79.755056, 		// according to the AI overview
+		long: -79.755056,
 		//lat : 40.3956247
-		lat : 40.438692 		// according to the AI overview from this
+		lat : 40.438692,
+		color: "#ffcc00"
 	},
 	{
 		name :"Manchester",
 		id : "manchester",
 		city : "Millvale",
 		long:  -79.9784,
-		lat : 40.4801
+		lat : 40.4801,
+		color: "#248f24"
 	},
 	{
 		name :"Liberty (SAHS)" ,
 		id : "liberty_sahs",
 		city : "McKeesport",
 		long: -79.842663296,
-		lat : 40.339665308
+		lat : 40.339665308,
+		color: "#ee1111"
 	},
+
 	{
 		name : "USA Pennsylvania Pittsburgh",
 		id : "usa_pennsylvania_pittsburgh",
 		city : "Pittsburgh",
 		long : -79.9972, // not quite sure of the accuracy
-		lat: 40.4387
+		lat: 40.4387,
+		color: "#1f5fef"
 	},
 	{
 		name : "All stations",
@@ -137,8 +146,17 @@ export const stations  = [
 ];
 
 
-
-export const marks = new Map;
-
-
-export const distances  = new Map;
+let Ozone=({ name: 'Ozone', id: "Ozone", show: true , title: 'Ozone', display: false, color: "#0066ff"})
+let pm10 =({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#ff0066"})
+let pm25 =({ name: 'PM2.5', id: "pm25", show: true, title: 'PM2.5', display: false , color: "#990099"})
+let CO2  =({ name: 'C02', id: "CO2", show: true, title: 'Carbon Dioxide', display: false, color: "#0000cc" })
+let SO2  =({ name: 'SO2', id: "SO2", show: true, title: 'Sulfur Dioxide', display: false , color: "#ffcc00"})
+let NO2  =({ name: 'NO2', id: "NO2", show: true, title: 'Nitrogen Dioxide', display: false, color: "#248f24" })
+export const allPollutants = ([
+	Ozone,
+	pm10,
+	pm25,
+	CO2,
+	SO2,
+	NO2
+])

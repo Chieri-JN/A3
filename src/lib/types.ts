@@ -16,6 +16,7 @@ export interface Item{
 	SO2: number;
 	CO: number;
 	pm10: number;
+	visible: boolean;
 }
 
 

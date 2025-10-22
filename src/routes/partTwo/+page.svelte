@@ -98,7 +98,7 @@
 <h1>
 	Part Two : Interactive Data Visualization
 </h1>
-<div style="padding-bottom: 1em">
+<div style="padding-bottom: 0.5em">
 	<label class="interaction-selector">
 <!--		<select class="interaction-selector" bind:value={showAllData}>-->
 <!--			<option value={true}>&#45;&#45;Compare All Stations&#45;&#45;</option>-->
@@ -119,7 +119,7 @@
 		<p>loading data...</p>
 	{:then data}
 		<div  style="padding-bottom: 100px">
-			<MapChart/>
+<!--			<MapChart/>-->
 			<AllData data={data}/>
 		</div>
 	{:catch error}
@@ -133,6 +133,9 @@
 	{:then [data1, data2]}
 		<div  style="padding-bottom: 100px">
 
+			<h2>
+				Comparing stations <em style="color: red">{getNameFromID(selectedDataset1.toString())}</em> and <em style="color: red">{getNameFromID(selectedDataset2.toString())}</em>
+			</h2>
 			<span class= "rs-span">
 			<div>
 				<span  >

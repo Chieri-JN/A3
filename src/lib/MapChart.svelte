@@ -147,7 +147,7 @@
 	});
 
 </script>
-<p>Hover points to see details</p>
+<p>Hover over points to see details</p>
 <div class="map">
 	<div class="tooltip" bind:this={tooltipElem}></div>
 	<svg bind:this={svgElem} width="400" height="400"  >

@@ -5,10 +5,12 @@
 	import { colours, datasets, stations } from '$lib/constants';
 	import type {Item} from '$lib/types';
 	import MapChart from '$lib/MapChart.svelte';
-	import AQIChart from '$lib/AQIChart.svelte';
 
 	let rMin = $state(-1);
 	let rMax = $state(-1);
+	let dMin = $state(new Date(2000));
+	let dMax = $state(new Date(2000));
+	let showRawData = $state(true);
 
 	let Ozone= $state({ name: 'Ozone', id: "Ozone", show: true , title: 'Ozone', display: false, color: "#0066ff"})
 	let pm10 = $state({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#ff0066"})
@@ -51,15 +53,21 @@
 
 </script>
 
-
-<h2>Comparing stations <em style="color: red">{nameOne}</em> and <em style="color: red">{nameTwo}</em></h2>
 <span class="charts">
 	<div>
 		<MapChart selectedStations={[nameOne,nameTwo]} 	data1={data1} data2={data2}/>
 	</div>
 	<div>
 <!--				<span class="charts">-->
-					<h3>Main Pollutants</h3>
+		<span class="mpLabel">
+			<h3>Main Pollutants</h3>
+<!--		<div>-->
+			<label for="ShowRawData">
+				Show Raw Data
+				<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
+			</label>
+<!--		</div>-->
+		</span>
 					<div>
 							{#each pollutants.filter(pol => pol.display) as p}
 								<span class = "p-selector">
@@ -71,12 +79,13 @@
 									<div class = "cell" style="background-color: {p.color}"></div>
 								</span>
 							{/each}
+
 					</div>
 					<div class="chart">
 						<BrushChart
 							data={data1}
 							stationName={nameOne}
-							showRawData={true}
+							showRawData={showRawData}
 							selectionRange={[rMin,rMax]}
 							showPollutants={pollutants}
 						/>
@@ -84,8 +93,8 @@
 					<div class="chart">
 						<BrushChart
 							data={data2}
-							stationName={nameOne}
-							showRawData={true}
+							stationName={nameTwo}
+							showRawData={showRawData}
 							selectionRange={[rMin,rMax]}
 							showPollutants={pollutants}
 						/>
@@ -134,6 +143,15 @@
       display: inline-flex;
       gap: 10px;
 
+	}
+
+	.mpLabel {
+      display: inline-flex;
+      align-content: center;
+      align-items: center;
+			label {
+					padding-left: 1em;
+			}
 	}
 
 </style>

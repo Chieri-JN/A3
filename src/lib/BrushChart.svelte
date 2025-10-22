@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as d3 from 'd3';
 	import  {onMount}  from 'svelte';
-	import {colours} from '$lib/constants.js';
+	import {colours, allPollutants} from '$lib/constants.js';
 	import type {Item, Pollutant} from './types'
 
 	let {
@@ -9,7 +9,7 @@
 				stationName="PlaceHolder",
 				isAllData=false,
 				showRawData=false,
-				showPollutants,
+				showPollutants=allPollutants,
 				selectionRange=[-1,-1]
 		}
 		: {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean, showPollutants:Pollutant[], selectionRange:number[]}  = $props();
@@ -22,6 +22,7 @@
 		for (let i = 0; i < showPollutants.length ; i++) {
 			let p = showPollutants[i];
 			if (d.mainPollutant === p.name) {
+				d.visible = p.show
 				return p.show
 			}
 		}
@@ -29,6 +30,7 @@
 	}
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
+	// remappedDates
 	const allPointsInMonth = new Map();
 	remappedDates.forEach(d => {
 		const key = d.timestamp.toString()
@@ -46,7 +48,13 @@
 	remappedDates.sort((a,b) =>  a.timestamp.getTime() - b.timestamp.getTime())
 
 	let svgElem: SVGSVGElement;
+
+	// Main drawing
 	function makeGraph() {
+		// filter points out of data.
+		let variableRemappedDates = remappedDates.filter(d => getView(d))
+
+
 		const margin = {top: 5, right: 30, bottom: 30, left: 60},
 			width = (isAllData ?  1000 : 800) - margin.left - margin.right,
 			height = (isAllData ? 500 : 350) - margin.top - margin.bottom;
@@ -113,7 +121,7 @@
 			.y1(d => y(d.high))
 
 		svg.append("path")
-			.datum(remappedDates)
+			.datum(variableRemappedDates)
 			.attr("fill", "#111111")
 			.attr("stroke", "none")
 			.attr("stroke-width", 0)
@@ -124,15 +132,14 @@
 			.x(d => x(d.timestamp))
 			.y(d => y(d.usAqi))
 		svg.append("path")
-			.datum(remappedDates)
+			.datum(variableRemappedDates)
 			.attr("fill", "none")
 			.attr("stroke", "black")
 			.attr("stroke-width", 2)
 			.attr("d", line)
 
 		// show raw data if toggle
-		// if (showRawData) {
-
+		if (showRawData) {
 			svg.append('g')
 				.selectAll("dot")
 				.data(data)
@@ -142,7 +149,7 @@
 				.attr("r", 2.5)
 				.style("visibility", d => (getView(d) ? "visible" : "hidden"))
 				.style("fill",  d => ((showPollutants.find(p => p.name === d.mainPollutant) ??{color : "black"})).color)
-		// }
+		}
 	}
 
 
@@ -152,6 +159,7 @@
 			const svg = d3.select(svgElem);
 			svg.selectAll('circle').remove();
 			svg.selectAll("rect").remove();
+			svg.selectAll("path").remove();
 
 			makeGraph();
 			svg.selectAll("circle")

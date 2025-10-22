@@ -19,12 +19,6 @@
 <!--	<MapChart/>-->
 <!--</div>-->
 <div>
-	<div style="padding-bottom: 1em">
-		<label for="ShowRawData">
-			Show Raw Data
-			<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
-		</label>
-	</div>
 	<div class="legend">
 		US AQI:
 		{#each colours as c}
@@ -33,9 +27,20 @@
 				</span>
 		{/each}
 	</div>
-	<div>
-		<SelectionChart data={data} stationName="all Stations" isAllData={true}  showRawData={showRawData}/>
+	<div style="padding-bottom: 0.1em">
+		<label for="ShowRawData">
+			Show Raw Data
+			<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
+		</label>
 	</div>
+
+	<div>
+		<SelectionChart data={data} stationName="all Stations"   showRawData={showRawData}/>
+	</div>
+
+<!--	<div style="padding-top: 5em">-->
+<!--		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData}/>-->
+<!--	</div>-->
 </div>
 
 
