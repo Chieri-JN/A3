@@ -75,7 +75,10 @@ export const stations  = [
 		city : "Avalon",
 		long : -80.0675554,
 		lat: 40.5009019,
-		color: "#992000"
+		color: "#992000",
+		maxAqi: 78,
+		minAqi: 10,
+		wiki : "Avalon is a borough in Allegheny County, Pennsylvania, United States, along the Ohio River 6 miles downstream from Pittsburgh. The population was 4,762 at the 2020 census. It is a residential suburb of the Pittsburgh metropolitan area."
 	},
 	{
 		name :"Glassport High Street",
@@ -83,7 +86,10 @@ export const stations  = [
 		city : "Glassport",
 		long: -79.888693,
 		lat : 40.326919,
-		color: "#ff0066"
+		color: "#ff0066",
+		maxAqi: 77,
+		minAqi: 7,
+		wiki : "Glassport is a borough in Allegheny County, Pennsylvania, United States, approximately 10 miles south of Pittsburgh and the confluence of the Monongahela and Allegheny rivers where they form the Ohio River."
 	},
 	{
 		name :"North Braddock",
@@ -91,7 +97,10 @@ export const stations  = [
 		city : "Braddock",
 		long: -79.856389,
 		lat : 40.405000,
-		color: "#990099"
+		color: "#990099",
+		maxAqi: 86,
+		minAqi: 0,
+		wiki :"North Braddock is a borough in Allegheny County, Pennsylvania, United States, along the Monongahela River. The 2020 census had the borough population at 4,320. It is a suburb 11 miles east of Pittsburgh"
 	},
 	{
 		name :"Lawrenceville",
@@ -99,7 +108,10 @@ export const stations  = [
 		city : "Pittsburgh",
 		long: -79.9609,
 		lat : 40.4698,
-		color: "#0000cc"
+		color: "#0000cc",
+		maxAqi: 161,
+		minAqi: 0,
+		wiki :"Lawrenceville is one of the largest neighborhood areas in Pittsburgh in the U.S. state of Pennsylvania. It is located northeast of downtown, and like many of the city's riverfront neighborhoods, it has an industrial past."
 	},
 	{
 		name :"Parkway East",
@@ -109,7 +121,10 @@ export const stations  = [
 		long: -79.755056,
 		//lat : 40.3956247
 		lat : 40.438692,
-		color: "#ffcc00"
+		color: "#ffcc00",
+		maxAqi: 152,
+		minAqi: 6,
+		wiki :"Interstate 376 (I-376) is a major auxiliary route of the Interstate Highway System in the US state of Pennsylvania, located within the Allegheny Plateau.  Within Allegheny County, the route runs along the majority of the Penn-Lincoln Parkway, known locally as Parkway West and Parkway East"
 	},
 	{
 		name :"Manchester",
@@ -117,7 +132,10 @@ export const stations  = [
 		city : "Millvale",
 		long:  -79.9784,
 		lat : 40.4801,
-		color: "#248f24"
+		color: "#248f24",
+		maxAqi: 83,
+		minAqi: 5,
+		wiki :"Manchester is a neighborhood located in the North Side region of Pittsburgh, Pennsylvania. The neighborhood is represented on Pittsburgh City Council by the District 6. Manchester houses PBF Battalion 1 & 37 Engine, and is covered by PBP Zone 1 and the Bureau of EMS Medic 4."
 	},
 	{
 		name :"Liberty (SAHS)" ,
@@ -125,7 +143,10 @@ export const stations  = [
 		city : "McKeesport",
 		long: -79.842663296,
 		lat : 40.339665308,
-		color: "#ee1111"
+		color: "#ee1111",
+		maxAqi: 158,
+		minAqi: 2,
+		wiki :"Liberty is a borough in Allegheny County, Pennsylvania, United States. The population was 2,355 at the 2020 census. Liberty does not have its own post office. The zip code is 15133, and mail is addressed to the city of McKeesport"
 	},
 
 	{
@@ -134,7 +155,10 @@ export const stations  = [
 		city : "Pittsburgh",
 		long : -79.9972, // not quite sure of the accuracy
 		lat: 40.4387,
-		color: "#1f5fef"
+		color: "#1f5fef",
+		maxAqi: 133,
+		minAqi: 3,
+		wiki :"Pittsburgh is a city in western Pennsylvania at the junction of 3 rivers. Its Gilded Age sites, including the Carnegie Museum of Natural History, the Carnegie Museum of Art and the Phipps Conservatory and Botanical Gardens, speak to its history as an early-20th-century industrial capital. In the North Shore neighborhood are the modern Andy Warhol Museum, Heinz Field football stadium and PNC Park baseball stadium."
 	},
 	{
 		name : "All stations",

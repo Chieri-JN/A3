@@ -15,6 +15,8 @@
 
 	let { selectedStations=["All stations"], data1, data2 } : {selectedStations : string[], data1:Item[], data2:Item[]} = $props()
 	console.log("Selected Stations:", selectedStations);
+	let red = "#ff0000"
+	let black = "#000000"
 
 	let hoverStation = $state("");
 
@@ -91,9 +93,11 @@
 
 		function mouseover(event, d) {
 			tooltip.style("opacity", 1)
-				.html(`<strong>${d.name}</strong>
-								<br>Lat: ${d.lat}
-								<br>Long: ${d.long}`);
+				.html(`<strong>Station: ${d.name}</strong>
+								<br><em>max AQI: </em>${d.maxAqi}
+								<br><em>min AQI: </em>${d.minAqi}
+								<br><em>Lat:</em> ${d.lat}
+								<br><em>Long:</em> ${d.long}`);
 			hoverStation = d.name;
 		}
 
@@ -135,20 +139,66 @@
 
 </script>
 
+<span class = mapStuff>
+	<div class="map"  bind:this={tooltipElem}>
+		<div>
+			<h2>Allegheny County, PA</h2>
+			<span class = "p-selector">
+				<div class = "cell-red" style="background-color: {red}"></div>
+				Selected Station
+				<div class = "cell-black" style="background-color: {black}"></div>
+				Unselected Station
+			</span>
+		</div>
+		<svg bind:this={svgElem} width="400" height="300"  >
+		</svg>
+	</div>
+	<div class="aboutGroup">
+	<h2>About: {hoverStation}</h2>
+		<p class="about"> {stations.find(s => s.name === hoverStation)?.wiki ?? "Hover over points to see details"}</p>
+	</div>
+</span>
 
-<div class="map"  bind:this={tooltipElem}>
-	<h3>Allegheny County, PA</h3> <em>Hover over the points to display details</em>
-	<svg bind:this={svgElem} width="400" height="300"  >
-	</svg>
-</div>
 
 
 <style>
 		.map {
-				padding-top: 0.4em;
 				align-items: center;
 		}
 
+		.mapStuff {
+        padding-top: 01em;
+				display: inline-flex;
+				gap: 5em;
+		}
+
+		.about {
+				max-width: 400px;
+				text-wrap: balance;
+		}
+
+		.aboutGroup {
+				/*padding-top: 1em;*/
+		}
+
+    .cell-red {
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+    }
+
+    .cell-black {
+        width: 10px;
+        height: 10px;
+        border-radius: 10px;
+    }
+
+    .p-selector{
+        padding-left: 0.75em;
+        padding-right: 0.75em;
+        display: inline-flex;
+        gap: 10px;
+		}
 </style>
 
 

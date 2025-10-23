@@ -27,20 +27,25 @@
 				</span>
 		{/each}
 	</div>
-	<div style="padding-top: 0.5em">
+	<div class="show">
 		<label for="ShowRawData">
 			Show Raw Data
 			<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
 		</label>
 	</div>
 
-<!--	<div>-->
-<!--		<SelectionChart data={data} stationName="all Stations"   showRawData={showRawData}/>-->
-<!--	</div>-->
+	<div>
+		<SelectionChart  showRawData={showRawData}  isBrush={false} />
+	</div>
 
 	<div>
-		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData} isAllData={true}/>
+		<h2>Chart with Brushing</h2>
+		<SelectionChart   showRawData={showRawData} isBrush={true}/>
 	</div>
+
+<!--	<div>-->
+<!--		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData} isAllData={true}/>-->
+<!--	</div>-->
 </div>
 
 
@@ -54,4 +59,9 @@
         align-items: center;
         display: inline-flex;
     }
+
+		.show {
+        padding-top: 0.5em;
+				padding-bottom:1em;
+		}
 </style>

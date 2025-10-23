@@ -17,6 +17,7 @@ export interface Item{
 	CO: number;
 	pm10: number;
 	visible: boolean;
+	selected : boolean;
 }
 
 

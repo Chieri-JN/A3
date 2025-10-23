@@ -10,6 +10,8 @@
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp ?? new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp ?? new Date());
 	let maxAQI = data.reduce((z, a) => z > a.usAqi ? z : a.usAqi, data[0].usAqi);
+	let minAQI = data.reduce((z, a) => z < a.usAqi ? z : a.usAqi, data[0].usAqi);
+	console.log(`minAqi ${minAQI} | maxAqui : ${maxAQI}`)
 
 	function getColour(val : number) {
 		if (0 <= val && val <= 50 ) {

@@ -8,11 +8,12 @@
 				data,
 				stationName="PlaceHolder",
 				isAllData=false,
+				isBrushing=false,
 				showRawData=false,
 				showPollutants=allPollutants,
 				selectionRange=[-1,-1, -1, -1]
 		}
-		: {data : Item[], stationName:string, isAllData:boolean , showRawData: Boolean, showPollutants:Pollutant[], selectionRange:number[]}  = $props();
+		: {data : Item[], stationName:string, isAllData:boolean, isBrushing:boolean , showRawData: Boolean, showPollutants:Pollutant[], selectionRange:number[]}  = $props();
 
 	let minYear = data.reduce((z, a) => z < a.timestamp ? z : a.timestamp , data[0].timestamp || new Date());
 	let maxYear = data.reduce((z, a) => z > a.timestamp ? z : a.timestamp, data[0].timestamp || new Date());
@@ -28,10 +29,17 @@
 		}
 		return false
 	}
+	// isAllData=true;
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
-	// remappedDates
 	const allPointsInMonth = new Map();
+
+
+	let selectedData : Item[] = $state([])
+	// let selectedData =[ ]
+	let selectedColor = "#2222CC";
+	let stationNames = []
+
 	remappedDates.forEach(d => {
 		const key = d.timestamp.toString()
 		const curr : number[] = allPointsInMonth.get(key) ?? [];
@@ -58,6 +66,7 @@
 	function makeGraph() {
 		// filter points out of data.
 		let variableRemappedDates = remappedDates.filter(d => getView(d))
+
 
 		d3.select(svgElem)
 			.selectAll("*")
@@ -150,7 +159,9 @@
 
 			function mouseover(event, d) {
 				if (isAllData) {
-				tooltip.style("opacity", 1)
+				// tooltip
+					tooltip.style("display", "block")
+						.style("opacity", 1)
 				}
 			}
 
@@ -160,19 +171,19 @@
 					.html(`<strong>${d.stationName ? "Station" : "City"}: ${d.stationName ?? d.city}</strong>
 									<br><em>Main Pollutant :</em> ${d.mainPollutant}
 									<br><em>AQI:</em> ${d.usAqi}
-									<br><em>Date:</em>${d.timestamp.toLocaleDateString()}` )
+									<br><em>Timestamp: </em>${d.timestamp.toLocaleDateString()}` )
 					.style("left", event.pageX + 10 + "px")
 					.style("top", event.pageY - 20 + "px");
 				}
 			}
-
-			// A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
 			function mouseleave(event,d) {
 				if (isAllData) {
 				tooltip
 					.transition()
 					.duration(200)
 					.style("opacity", 0)
+					// .style("visibility", "hidden")
+					.style("display", "none")
 				}
 			}
 
@@ -185,12 +196,50 @@
 				.attr("cy", function (d) { return y(d.usAqi); } )
 				.attr("r", 2.5)
 				.style("visibility", d => (getView(d) ? "visible" : "hidden"))
-				.style("fill",  d => (isAllData	? 'black' :(showPollutants.find(p => p.name === d.mainPollutant) ??{color : "black"})).color)
+				.style("fill",  d => {
+					if (isAllData) {
+						return d.selected ? selectedColor : "black"
+					}
+					return ((showPollutants.find(p => p.name === d.mainPollutant) ?? { color: 'black' })).color;
+				})
+				// .style("border-width", d => d.selected ? "2px" : "0px")
 				.on("mouseover", mouseover )
 				.on("mouseenter", mousemove )
 				.on("mouseleave", mouseleave )
 
+
+			if (isBrushing) {
+				const circles = svg.selectAll("circle");
+
+				const brush = d3.brush()
+					.extent([[0, 0], [width, height]])
+					.on("start brush end", brushed);
+
+				function brushed (event) {
+					const selection = event.selection;
+					if (!selection) {
+						circles.each(d => d.selected=false)
+						return;
+					}
+					const [[x0, y0], [x1, y1]] = selection;
+					circles.each((d) => {
+						const cx = x(d.timestamp);
+						const cy = y(d.usAqi);
+						d.selected = x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
+					}).style("fill", d => d.selected ? selectedColor : "black");
+					selectedData = data.filter(d => d.selected)
+					selectedData = [...selectedData];
+					console.log("Selected data", selectedData)
+				}
+
+				svg.append("g")
+					.attr("class", "brush")
+					.call(brush);
+			}
+
 		}
+
+
 	}
 
 
@@ -219,14 +268,16 @@
 
 
 {#if isAllData}
+	{#if isBrushing}
+		<h3>Number of selected points: {selectedData.length}</h3>
+	{/if}
 	<div bind:this={toolElem}>
-		<h2>All the Stations</h2>
 		<svg bind:this={svgElem} width={"600"} height="400"  >
 		</svg>
 	</div>
 {:else}
 	<div class="content">
-		<h2>Pollutants for {stationName}</h2>
+		<h2>Chart for {stationName}</h2>
 		<svg bind:this={svgElem} width="650" height="350"  >
 		</svg>
 	</div>

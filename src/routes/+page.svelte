@@ -3,6 +3,7 @@
 	import * as d3 from 'd3';
 	import { colours, datasets, stations } from '$lib/constants';
 	import Chip from '$lib/Chip.svelte';
+	import BrushChart from '$lib/BrushChart.svelte';
 
 	let showRawData = $state(false);
 
