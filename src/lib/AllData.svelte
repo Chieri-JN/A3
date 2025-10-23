@@ -38,9 +38,9 @@
 		<SelectionChart data={data} stationName="all Stations"   showRawData={showRawData}/>
 	</div>
 
-<!--	<div style="padding-top: 5em">-->
-<!--		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData}/>-->
-<!--	</div>-->
+	<div style="padding-top: 5em">
+		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData} isAllData={true}/>
+	</div>
 </div>
 
 

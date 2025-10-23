@@ -113,7 +113,7 @@
 			.attr("width", width)
 			.attr("height", d => band(d.min-1 < 0 ? 0 : d.min-1 ) -band(d.max ?? maxAQI))
 			.style("fill",  d => d.color)
-			.attr("opacity", 0.25);
+			.attr("opacity", (isAllData ? 0.5 : 0.25));
 
 		const eightyP = d3.area<Item>()
 			.x(d => x(d.timestamp))
@@ -148,7 +148,7 @@
 				.attr("cy", function (d) { return y(d.usAqi); } )
 				.attr("r", 2.5)
 				.style("visibility", d => (getView(d) ? "visible" : "hidden"))
-				.style("fill",  d => ((showPollutants.find(p => p.name === d.mainPollutant) ??{color : "black"})).color)
+				.style("fill",  d => (isAllData	? 'black' :(showPollutants.find(p => p.name === d.mainPollutant) ??{color : "black"})).color)
 		}
 	}
 
@@ -176,8 +176,8 @@
 
 </script>
 {#if {isAllData}}
-	<h2> {stationName}</h2>
-	<svg bind:this={svgElem} width="600" height="320"  >
+	<h2>All the Stations</h2>
+	<svg bind:this={svgElem} width={"600"} height="400"  >
 	</svg>
 {:else}
 	<div class="content">
