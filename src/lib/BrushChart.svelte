@@ -65,7 +65,6 @@
 	// Main drawing
 	let variableRemappedDates = remappedDates.filter(d => getView(d))
 	function makeGraph() {
-		// filter points out of data.
 		variableRemappedDates = remappedDates.filter(d => getView(d))
 
 
@@ -144,7 +143,6 @@
 			.attr("stroke-width", 2)
 			.attr("d", line)
 
-		// show raw data if toggle
 		if (showRawData) {
 
 			const tooltip = d3.select("body")
@@ -160,7 +158,6 @@
 
 			function mouseover(event, d) {
 				if (isAllData) {
-				// tooltip
 					tooltip.style("display", "block")
 						.style("opacity", 1)
 				}
@@ -276,7 +273,7 @@
 		<h2>Chart for {stationName}</h2>
 		{#if isBrushing}
 			<p>
-				Min/Max AQI of selected points:
+				Min/Max AQI of selected points:<br>
 				Min: <strong>{selectedData.reduce((z, a) => z < a.usAqi ? z : a.usAqi, Number.POSITIVE_INFINITY)}</strong>
 				Max : <strong>{selectedData.reduce((z, a) => z > a.usAqi ? z : a.usAqi, Number.NEGATIVE_INFINITY)}</strong>
 			</p>
