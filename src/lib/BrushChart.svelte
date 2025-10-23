@@ -29,7 +29,7 @@
 		}
 		return false
 	}
-	// isAllData=true;
+
 
 	let remappedDates : Item[] = structuredClone(data).map<Item>(d => {d.timestamp = new Date(d.timestamp.getFullYear(), d.timestamp.getMonth(),15); return d;});
 	const allPointsInMonth = new Map();
@@ -37,7 +37,7 @@
 
 	let selectedData : Item[] = $state([])
 	// let selectedData =[ ]
-	let selectedColor = "#2222CC";
+	let selectedColor = "#ff8000";
 	let stationNames = []
 
 	remappedDates.forEach(d => {
@@ -63,9 +63,10 @@
 		height = (isAllData ? 500 : 350) - margin.top - margin.bottom;
 
 	// Main drawing
+	let variableRemappedDates = remappedDates.filter(d => getView(d))
 	function makeGraph() {
 		// filter points out of data.
-		let variableRemappedDates = remappedDates.filter(d => getView(d))
+		variableRemappedDates = remappedDates.filter(d => getView(d))
 
 
 		d3.select(svgElem)
@@ -196,12 +197,7 @@
 				.attr("cy", function (d) { return y(d.usAqi); } )
 				.attr("r", 2.5)
 				.style("visibility", d => (getView(d) ? "visible" : "hidden"))
-				.style("fill",  d => {
-					if (isAllData) {
-						return d.selected ? selectedColor : "black"
-					}
-					return ((showPollutants.find(p => p.name === d.mainPollutant) ?? { color: 'black' })).color;
-				})
+				.style("fill",  d => d.selected ? selectedColor : ((showPollutants.find(p => p.name === d.mainPollutant) ?? { color: 'black' })).color)
 				// .style("border-width", d => d.selected ? "2px" : "0px")
 				.on("mouseover", mouseover )
 				.on("mouseenter", mousemove )
@@ -219,6 +215,7 @@
 					const selection = event.selection;
 					if (!selection) {
 						circles.each(d => d.selected=false)
+							.style("fill",  d => d.selected ? selectedColor : ((showPollutants.find(p => p.name === d.mainPollutant) ?? { color: 'black' })).color)
 						return;
 					}
 					const [[x0, y0], [x1, y1]] = selection;
@@ -226,8 +223,8 @@
 						const cx = x(d.timestamp);
 						const cy = y(d.usAqi);
 						d.selected = x0 <= cx && cx <= x1 && y0 <= cy && cy <= y1;
-					}).style("fill", d => d.selected ? selectedColor : "black");
-					selectedData = data.filter(d => d.selected)
+					}).style("fill", d => d.selected ? selectedColor : ((showPollutants.find(p => p.name === d.mainPollutant) ?? { color: 'black' })).color);
+					selectedData = data.filter(d => d.selected && d.visible)
 					selectedData = [...selectedData];
 					console.log("Selected data", selectedData)
 				}
@@ -266,7 +263,6 @@
 
 </script>
 
-
 {#if isAllData}
 	{#if isBrushing}
 		<h3>Number of selected points: {selectedData.length}</h3>
@@ -278,6 +274,13 @@
 {:else}
 	<div class="content">
 		<h2>Chart for {stationName}</h2>
+		{#if isBrushing}
+			<p>
+				Min/Max AQI of selected points:
+				Min: <strong>{selectedData.reduce((z, a) => z < a.usAqi ? z : a.usAqi, Number.POSITIVE_INFINITY)}</strong>
+				Max : <strong>{selectedData.reduce((z, a) => z > a.usAqi ? z : a.usAqi, Number.NEGATIVE_INFINITY)}</strong>
+			</p>
+		{/if}
 		<svg bind:this={svgElem} width="650" height="350"  >
 		</svg>
 	</div>
@@ -302,7 +305,14 @@
         position: relative;
     }
 
-    .content h2 {
+    .content h2{
+        margin: 0;
+        /*text-align: center;*/
+        /*white-space: nowrap;*/
+        padding-left: 50px;
+    }
+
+    .content p{
         margin: 0;
         /*text-align: center;*/
         /*white-space: nowrap;*/

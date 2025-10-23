@@ -93,6 +93,7 @@
 							selectionRange={[rMax, rMax, dMin, dMax]}
 							showPollutants={pollutants}
 							isAllData={false}
+							isBrushing={true}
 						/>
 					</div>
 					<div class="chart">
@@ -103,6 +104,7 @@
 							selectionRange={[rMin,rMax]}
 							showPollutants={pollutants}
 							isAllData={false}
+							isBrushing={true}
 						/>
 					</div>
 				</span>
