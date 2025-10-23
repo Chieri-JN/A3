@@ -8,7 +8,7 @@
 	import SelectionChart from '$lib/SelectionChart.svelte';
 
 	let { data } : {data : Item[]} = $props();
-	let showRawData = $state(false);
+	let showRawData = $state(true);
 
 	// console.log(data)
 </script>
@@ -27,18 +27,18 @@
 				</span>
 		{/each}
 	</div>
-	<div style="padding-bottom: 0.1em">
+	<div style="padding-top: 0.5em">
 		<label for="ShowRawData">
 			Show Raw Data
 			<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
 		</label>
 	</div>
 
-	<div>
-		<SelectionChart data={data} stationName="all Stations"   showRawData={showRawData}/>
-	</div>
+<!--	<div>-->
+<!--		<SelectionChart data={data} stationName="all Stations"   showRawData={showRawData}/>-->
+<!--	</div>-->
 
-	<div style="padding-top: 5em">
+	<div>
 		<BrushChart data={data} stationName="all Stations"   showRawData={showRawData} isAllData={true}/>
 	</div>
 </div>

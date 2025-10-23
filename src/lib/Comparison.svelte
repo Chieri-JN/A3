@@ -8,12 +8,15 @@
 
 	let rMin = $state(-1);
 	let rMax = $state(-1);
-	let dMin = $state(new Date(2000));
-	let dMax = $state(new Date(2000));
+	// let dMin = $state(new Date(2000));
+	// let dMax = $state(new Date(2500));
+	let dMin = $state(2000);
+	let dMax = $state(2500);
+
 	let showRawData = $state(true);
 
 	let Ozone= $state({ name: 'Ozone', id: "Ozone", show: true , title: 'Ozone', display: false, color: "#0066ff"})
-	let pm10 = $state({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#ff0066"})
+	let pm10 = $state({ name: 'PM10', id: "pm10", show: true, title: 'PM10', display: false, color: "#ff0011"})
 	let pm25 = $state({ name: 'PM2.5', id: "pm25", show: true, title: 'PM2.5', display: false , color: "#990099"})
 	let CO2  = $state({ name: 'C02', id: "CO2", show: true, title: 'Carbon Dioxide', display: false, color: "#0000cc" })
 	let SO2  = $state({ name: 'SO2', id: "SO2", show: true, title: 'Sulfur Dioxide', display: false , color: "#ffcc00"})
@@ -53,12 +56,11 @@
 
 </script>
 
+
 <span class="charts">
+<!--	FLIP BETWEEN MAP AND CHARTS-->
+
 	<div>
-		<MapChart selectedStations={[nameOne,nameTwo]} 	data1={data1} data2={data2}/>
-	</div>
-	<div>
-<!--				<span class="charts">-->
 		<span class="mpLabel">
 			<h3>Main Pollutants</h3>
 <!--		<div>-->
@@ -67,6 +69,7 @@
 				<input type="checkbox" id="ShowRawData" bind:checked={showRawData}>
 			</label>
 <!--		</div>-->
+
 		</span>
 					<div>
 							{#each pollutants.filter(pol => pol.display) as p}
@@ -81,13 +84,15 @@
 							{/each}
 
 					</div>
+		<span class="charts">
 					<div class="chart">
 						<BrushChart
 							data={data1}
 							stationName={nameOne}
 							showRawData={showRawData}
-							selectionRange={[rMin,rMax]}
+							selectionRange={[rMax, rMax, dMin, dMax]}
 							showPollutants={pollutants}
+							isAllData={false}
 						/>
 					</div>
 					<div class="chart">
@@ -97,11 +102,17 @@
 							showRawData={showRawData}
 							selectionRange={[rMin,rMax]}
 							showPollutants={pollutants}
+							isAllData={false}
 						/>
 					</div>
-<!--				</span>-->
+				</span>
 	</div>
 </span>
+
+<div>
+	<MapChart selectedStations={[nameOne,nameTwo]} 	data1={data1} data2={data2}/>
+</div>
+
 
 <!--<pre>-->
 <!--{JSON.stringify(data1[0], null, 2)}-->
@@ -113,11 +124,10 @@
 
 <style>
 	.charts {
-      padding-left: 0.75em;
+      /*padding-left: 0.75em;*/
       padding-right: 0.75em;
       display: inline-flex;
-      gap: 10px;
-
+      /*gap: 10px;*/
       border-radius: 10px;
       justify-content: space-between;
       align-content: center;
@@ -126,7 +136,7 @@
       /*height: 50px;*/
 	}
 	.chart {
-			padding-right: 5em;
+			/*padding-right: 5em;*/
 			/*padding-left: 1em;*/
 			/*padding-bottom: 5em;*/
 	}

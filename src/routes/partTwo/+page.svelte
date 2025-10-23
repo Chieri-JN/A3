@@ -166,13 +166,15 @@
 
 
 			</span>
+			<div>
+				<Comparison
+					data1={data1}
+					data2={data2}
+					nameOne={getNameFromID(selectedDataset1.toString())}
+					nameTwo={getNameFromID(selectedDataset2.toString())}
+				/>
+			</div>
 
-			<Comparison
-				data1={data1}
-				data2={data2}
-				nameOne={getNameFromID(selectedDataset1.toString())}
-				nameTwo={getNameFromID(selectedDataset2.toString())}
-			/>
 		</div>
 	{:catch error}
 		<!-- promise was rejected -->
